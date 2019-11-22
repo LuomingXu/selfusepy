@@ -4,6 +4,7 @@ import urllib3, json
 from urllib.parse import urlencode
 
 
+# todo 完善
 class Request(object):
   def __init__(self):
     self.http = urllib3.PoolManager()
@@ -37,7 +38,7 @@ class Request(object):
     else:
       self.res = self.http.request('PUT', url)
 
-  def post(self, url: str, body: object):
+  def post(self, url: str, body: object, **params: dict):
     """
     http post method
     :param url: URL
@@ -46,3 +47,6 @@ class Request(object):
     """
     self.res = self.http.request('POST', url, body = json.dumps(body.__dict__),
                                  headers = {'Content-Type': 'application/json'})
+
+  def delete(self, url: str, **params: dict):
+    self.res = self.http.request('DELETE', url, fields = params)

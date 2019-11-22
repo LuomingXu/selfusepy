@@ -25,7 +25,7 @@ class ShowProcess(object):
   调用该类相关函数即可实现处理进度的显示
   # 效果为[>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>]100.00%
   """
-  
+
   i = 0  # 当前的处理进度
   max_steps = 0  # 总共需要处理的次数
   max_arrow = 50  # 进度条的长度
@@ -61,12 +61,19 @@ class ShowProcess(object):
 
 class Logger(object):
   """
-  usage: log = Logger('error.log').logger
+  usage: log = Logger('error.log').logger OR log = Logger().logger
          log.info('info')
   """
 
   def __init__(self, filename = None, when = 'D', backCount = 3,
                fmt = '%(asctime)s - [%(levelname)8s] - [%(threadName)20s] %(module)10s.%(funcName)s - %(filename)s[line:%(lineno)d] : %(message)s'):
+    """
+    init
+    :param filename: 储存日志的文件, 为None的话就是不储存日志到文件
+    :param when: 间隔的时间单位. S秒, M分, H小时, D天, W每星期(interval==0时代表星期一) midnight 每天凌晨
+    :param backCount: 备份文件的个数, 如果超过这个个数, 就会自动删除
+    :param fmt: 日志格式
+    """
     self.logger = logging.getLogger(filename)
     format_str = logging.Formatter(fmt)
     self.logger.setLevel(logging.DEBUG)  # 设置日志级别为debug, 所有的log都可以打印出来
@@ -78,7 +85,5 @@ class Logger(object):
       th = handlers.TimedRotatingFileHandler(filename = filename, when = when, backupCount = backCount,
                                              encoding = 'utf-8')
       # 实例化TimedRotatingFileHandler
-      # backupCount是备份文件的个数，如果超过这个个数，就会自动删除，when是间隔的时间单位，单位有以下几种：
-      # S秒, M分, H小时, D天, W每星期(interval==0时代表星期一) midnight 每天凌晨
       th.setFormatter(format_str)  # 设置文件里写入的格式
       self.logger.addHandler(th)
