@@ -1,3 +1,4 @@
 .idea/
 selfusepy.egg-info/
 dist/
+*/__pycache__/

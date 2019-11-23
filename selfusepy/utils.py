@@ -1,10 +1,11 @@
 # encoding:utf-8
 
-import sys, logging
+import logging
+import sys
 from logging import handlers
 
 
-def override_str(clz):
+def override_str(clazz):
   """
   override default func __str__(), print Object like Java toString() style
   """
@@ -15,8 +16,21 @@ def override_str(clz):
       ', '.join('%s: %s' % item for item in vars(self).items())
     )
 
-  clz.__str__ = __str__
-  return clz
+  clazz.__str__ = __str__
+  return clazz
+
+
+class EnableJsonInterface(object):
+  """
+  可以将多级Json转化为Py对象
+  usage: obj: Obj = Json.loads(jsonStr, object_hook = Obj.from_dict)
+  """
+
+  @classmethod
+  def from_dict(clazz, dict):
+    obj = clazz()
+    obj.__dict__.update(dict)
+    return obj
 
 
 class ShowProcess(object):
@@ -31,14 +45,21 @@ class ShowProcess(object):
   max_arrow = 50  # 进度条的长度
   infoDone = 'done'
 
-  # 初始化函数，需要知道总共的处理次数
   def __init__(self, max_steps, infoDone = 'Done'):
+    """
+    初始化函数，需要知道总共的处理次数
+    :param max_steps: 总共需要处理的次数
+    :param infoDone: 结束时打印的字符
+    """
     self.max_steps = max_steps
     self.i = 0
     self.infoDone = infoDone
 
-  # 显示函数，根据当前的处理进度i显示进度
   def show_process(self, i = None):
+    """
+    显示函数，根据当前的处理进度i显示进度
+    :param i: 当前进度
+    """
     if i is not None:
       self.i = i
     else:
@@ -61,6 +82,7 @@ class ShowProcess(object):
 
 class Logger(object):
   """
+  日志类
   usage: log = Logger('error.log').logger OR log = Logger().logger
          log.info('info')
   """
@@ -82,8 +104,8 @@ class Logger(object):
     self.logger.addHandler(sh)
 
     if filename is not None:
+      """实例化TimedRotatingFileHandler"""
       th = handlers.TimedRotatingFileHandler(filename = filename, when = when, backupCount = backCount,
                                              encoding = 'utf-8')
-      # 实例化TimedRotatingFileHandler
       th.setFormatter(format_str)  # 设置文件里写入的格式
       self.logger.addHandler(th)
