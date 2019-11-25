@@ -1,0 +1,8 @@
+{
+  "__classname__": "Point",
+  "x": 2,
+  "demo": {
+    "__classname__": "Demo",
+    "y": 2
+  }
+}
