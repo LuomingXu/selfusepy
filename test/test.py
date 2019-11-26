@@ -1,82 +1,42 @@
-import selfusepy
-from jsonparse import BaseJsonObject
-from selfusepy.utils import override_str
+import selfusepy, binascii
 from typing import List
+from jsontest.jsontest import One, One1
+from crc32 import crc32DO
+from bilibili.db import DBSession, engine
+from selfusepy.utils import Logger
+
+def json_test_1():
+  """
+  json test
+  e.g. 1
+  """
+  f = open('./jsontest/eg1.json', 'r')
+  obj: One = selfusepy.parse_json(f.read(), One())
+  print(obj)
 
 
-@override_str
-class Point(BaseJsonObject):
-
-  def __init__(self):
-    self.x: int = -1
-    self.demo: Point.Demo = Point.Demo()
-
-  @override_str
-  class Demo(BaseJsonObject):
-    def __init__(self):
-      self.y: int = -1
-      self.demo1: List[Point.Demo.Demo1] = [Point.Demo.Demo1()]
-
-    class Demo1(BaseJsonObject):
-      def __init__(self):
-        self.z: int = -1
-
-
-def serialize_instance(obj):
-  d = {'__classname__': type(obj).__name__}
-  d.update(vars(obj))
-  return d
-
-
-classes = {}
-
-
-def deserialize_object(d):
-  cls = d.pop('__classname__', None)
-  if cls:
-    cls = classes[cls]
-    obj = cls.__new__(cls)  # Make instance without calling __init__
-    for key, value in d.items():
-      setattr(obj, key, value)
-    return obj
-  else:
-    return d
+def json_test_2():
+  """
+  json test with jsonarray
+  e.g. 2
+  """
+  f = open('./jsontest/eg2.json', 'r')
+  obj: One1 = selfusepy.parse_json(f.read(), One1())
+  print(obj)
 
 
 if __name__ == '__main__':
-  # s = 'dsfJLKkk'
-  # print(upper_first_letter(s))
-  # p = Point(1, 2, Demo(3))
-  # s = json.dumps(p, default = serialize_instance)
-  # print(s)
-  # p = Point()
-  # cls = type(p.p)
-  # cls .__new__(cls)
-  # print(cls)
-  # print(type(getattr(p, 'p')))
-  #
-  # test(Point())
-  #
-  # print(classes)
-  # print(classes.pop('Demo1'))
+  # json_test_1()
+  # json_test_2()
 
-  # test = eval(type(dskfj).__name__ + '()')
-  # print('test: %s' % (test.__str__()))
-
-  p: Point = selfusepy.parse_json(open('test.json', 'r').read(), Point())
-
-  print(p)
-
-
-  # f = open('test.json', 'r')
-  # s = f.read()
-  # obj: Point = selfusepy.parse_json(s, Point())
-  # print(obj)
-
-  # p: Point = json.loads(add_classname(json.loads(s), 'Point'), object_hook = deserialize_object)
-  # print(p.demo)
-  #
-  # f = open('test.json', 'r')
-  # s = f.read()
-  # p1 = json.loads(s, object_hook = Point.unserialize_object)
-  # print(p1)
+  log = Logger().logger
+  hashes: List[crc32DO] = []
+  conn = engine.connect()
+  for i in range(660_0001, 10_0000_0000):
+    hashes.append(crc32DO(binascii.crc32(str(i).encode("utf-8")), i))
+    if i % 10_0000 == 0:
+      log.info('i: %s' % i)
+      sql: str = "insert into crc32(hash, value) values %s" % (', '.join('%s' % item.__str__() for item in hashes))
+      hashes.clear()
+      conn.execute(sql)
+      log.info('Done')

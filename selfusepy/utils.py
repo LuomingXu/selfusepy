@@ -1,3 +1,10 @@
+#  The Apache License Version 2.0
+#  Copyright (c) 2019
+#  Author : Luoming Xu
+#  Project Name : selfusepy
+#  File Name : utils.py
+#  CreateTime: 2019/11/26 20:45
+
 import logging
 import sys
 from logging import handlers
@@ -5,6 +12,7 @@ from logging import handlers
 
 def override_str(clazz):
   """
+  todo override List.__str__()
   override default func __str__(), print Object like Java toString() style
   """
 
@@ -16,19 +24,6 @@ def override_str(clazz):
 
   clazz.__str__ = __str__
   return clazz
-
-
-class EnableJsonInterface(object):
-  """
-  可以将多级Json转化为Py对象
-  usage: obj: Obj = Json.loads(jsonStr, object_hook = Obj.from_dict)
-  """
-
-  @classmethod
-  def from_dict(clazz, dict):
-    obj = clazz()
-    obj.__dict__.update(dict)
-    return obj
 
 
 class ShowProcess(object):
@@ -110,4 +105,9 @@ class Logger(object):
 
 
 def upper_first_letter(s: str) -> str:
+  """
+  make first letter upper case
+  :param s:
+  :return:
+  """
   return s[0].capitalize() + s[1:]

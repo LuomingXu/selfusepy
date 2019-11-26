@@ -1,5 +1,14 @@
-import urllib3, json
+#  The Apache License Version 2.0
+#  Copyright (c) 2019
+#  Author : Luoming Xu
+#  Project Name : selfusepy
+#  File Name : url.py
+#  CreateTime: 2019/11/26 20:45
+
+import json
 from urllib.parse import urlencode
+
+import urllib3
 from urllib3.response import HTTPResponse
 
 
@@ -21,16 +30,18 @@ class Request(object):
     self.http = urllib3.PoolManager()
     self.UTF8 = 'utf-8'
 
-  def get(self, url: str, **params: dict) -> HTTPResponse:
+  def get(self, url: str, head: dict = None, **params: dict) -> HTTPResponse:
     """
     http GET method
+    :param head: request header
     :param url: URL
     :param params: http request params. should be class's dict. e.g., url.Request.get('https://example.com', **object.__dict__)
                    if your define a dict variable, you just use it like, url.Request.get('https://example.com', **dict)
     :return:
     """
     if params is not None:
-      return self.http.request('GET', url, fields = params)
+      return self.http.request('GET', url, headers = head,
+                               fields = params)
     else:
       return self.http.request('GET', url)
 

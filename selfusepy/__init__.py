@@ -1,21 +1,52 @@
+#  The Apache License Version 2.0
+#  Copyright (c) 2019
+#  Author : Luoming Xu
+#  Project Name : selfusepy
+#  File Name : __init__.py
+#  CreateTime: 2019/11/26 20:45
+
 import json
 from typing import TypeVar
-from jsonparse import generate_class_dict, add_classname, deserialize_object, class_dict
+from url import Request, HTTPResponse
+
+import jsonparse
 
 T = TypeVar('T')
 
 
 def parse_json(j: str, obj: T) -> T:
   """
-  json to Py object
+  Json to Python Object
+  >>>import selfusepy
+  >>>obj: T = selfusepy.parse_json(jsonStr, Obj())
   :param j: json string
   :param obj: Py Object
   :return: obj
   """
-  generate_class_dict(obj)
-  json_dict: dict = json.loads(j)
-  j_modified: str = add_classname(json_dict, type(obj).__name__)
-  obj = json.loads(j_modified, object_hook = deserialize_object)
 
-  class_dict.clear()
+  jsonparse.generate_class_dict(obj)
+  json_dict: dict = json.loads(j)
+  j_modified: str = jsonparse.add_classname(json_dict, type(obj).__name__)
+  obj = json.loads(j_modified, object_hook = jsonparse.deserialize_object)
+
+  jsonparse.class_dict.clear()
   return obj
+
+
+req: Request = Request()
+
+
+def get(url: str, head: dict, **params: dict) -> HTTPResponse:
+  return req.get(url, head, **params)
+
+
+def put(url: str, body: object = None, **params: dict) -> HTTPResponse:
+  return req.put(url, body, **params)
+
+
+def post(url: str, body: object, **params: dict) -> HTTPResponse:
+  return req.post(url, body, **params)
+
+
+def delete(url: str, **params: dict) -> HTTPResponse:
+  return req.delete(url, **params)
