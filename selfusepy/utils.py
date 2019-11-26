@@ -1,5 +1,3 @@
-# encoding:utf-8
-
 import logging
 import sys
 from logging import handlers
@@ -109,3 +107,7 @@ class Logger(object):
                                              encoding = 'utf-8')
       th.setFormatter(format_str)  # 设置文件里写入的格式
       self.logger.addHandler(th)
+
+
+def upper_first_letter(s: str) -> str:
+  return s[0].capitalize() + s[1:]

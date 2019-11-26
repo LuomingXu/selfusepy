@@ -1,42 +1,25 @@
-import json
+import selfusepy
+from jsonparse import BaseJsonObject
+from selfusepy.utils import override_str
+from typing import List
 
 
-class Demo(object):
-  def __init__(self):
-    self.y: int = -1
-
-
-class Point(object):
-
-  def unserialize_object(d: dict):
-    for key, value in d.items():
-      cls = type(getattr(Point(), key))
-      obj = cls.__new__(cls)
-      setattr(obj, key, value)
-    return obj
-
-  def __demo__(self):
-    for item in vars(self):
-      cls = type(getattr(self, item))
-      try:
-        print('item: %s, class: %s' % (item, cls))
-        obj = eval(cls())
-        print('')
-        print(vars(obj))
-      except BaseException as e:
-        pass
+@override_str
+class Point(BaseJsonObject):
 
   def __init__(self):
     self.x: int = -1
-    self.demo: Demo = Demo()
+    self.demo: Point.Demo = Point.Demo()
 
-    self.__demo__()
+  @override_str
+  class Demo(BaseJsonObject):
+    def __init__(self):
+      self.y: int = -1
+      self.demo1: List[Point.Demo.Demo1] = [Point.Demo.Demo1()]
 
-
-classes = {
-  'Point': Point,
-  'Demo': Demo
-}
+    class Demo1(BaseJsonObject):
+      def __init__(self):
+        self.z: int = -1
 
 
 def serialize_instance(obj):
@@ -45,10 +28,13 @@ def serialize_instance(obj):
   return d
 
 
-def unserialize_object(d):
-  clsname = d.pop('__classname__', None)
-  if clsname:
-    cls = classes[clsname]
+classes = {}
+
+
+def deserialize_object(d):
+  cls = d.pop('__classname__', None)
+  if cls:
+    cls = classes[cls]
     obj = cls.__new__(cls)  # Make instance without calling __init__
     for key, value in d.items():
       setattr(obj, key, value)
@@ -58,6 +44,8 @@ def unserialize_object(d):
 
 
 if __name__ == '__main__':
+  # s = 'dsfJLKkk'
+  # print(upper_first_letter(s))
   # p = Point(1, 2, Demo(3))
   # s = json.dumps(p, default = serialize_instance)
   # print(s)
@@ -66,11 +54,27 @@ if __name__ == '__main__':
   # cls .__new__(cls)
   # print(cls)
   # print(type(getattr(p, 'p')))
-  print(vars(Point.__new__(Point)))
-  dskfj = Point()
-  # f = open('demo.json', 'r')
+  #
+  # test(Point())
+  #
+  # print(classes)
+  # print(classes.pop('Demo1'))
+
+  # test = eval(type(dskfj).__name__ + '()')
+  # print('test: %s' % (test.__str__()))
+
+  p: Point = selfusepy.parse_json(open('test.json', 'r').read(), Point())
+
+  print(p)
+
+
+  # f = open('test.json', 'r')
   # s = f.read()
-  # p = json.loads(s, object_hook = unserialize_object)
+  # obj: Point = selfusepy.parse_json(s, Point())
+  # print(obj)
+
+  # p: Point = json.loads(add_classname(json.loads(s), 'Point'), object_hook = deserialize_object)
+  # print(p.demo)
   #
   # f = open('test.json', 'r')
   # s = f.read()

@@ -1,5 +1,3 @@
-# encoding:utf-8
-
 import urllib3, json
 from urllib.parse import urlencode
 from urllib3.response import HTTPResponse
