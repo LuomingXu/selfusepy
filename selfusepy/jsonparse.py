@@ -12,7 +12,7 @@
 """
 from typing import List
 
-from utils import upper_first_letter
+from selfusepy.utils import upper_first_letter
 
 class_dict = {}
 

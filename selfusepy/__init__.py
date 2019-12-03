@@ -7,9 +7,9 @@
 
 import json
 from typing import TypeVar
-from url import Request, HTTPResponse
+from selfusepy.url import Request, HTTPResponse
 
-import jsonparse
+import selfusepy.jsonparse
 
 T = TypeVar('T')
 
