@@ -43,48 +43,53 @@ class Request(object):
       return self.http.request('GET', url, headers = head,
                                fields = params)
     else:
-      return self.http.request('GET', url)
+      return self.http.request('GET', url, headers = head)
 
-  def put(self, url: str, body: object = None, **params: dict) -> HTTPResponse:
+  def put(self, url: str, body: object = None, head: dict = None, **params: dict) -> HTTPResponse:
     """
     http PUT method
+    :param head: request header
     :param url: URL
     :param body: put body. one object
     :param params: http request params
     :return:
     """
+    head['Content-Type'] = 'application/json'
     if params is not None:
       url += '?' + urlencode(params)
     if body is not None:
       return self.http.request('PUT', url, body = json.dumps(body.__dict__),
-                               headers = {'Content-Type': 'application/json'})
+                               headers = head)
     else:
-      return self.http.request('PUT', url)
+      return self.http.request('PUT', url, headers = head)
 
-  def post(self, url: str, body: object, **params: dict) -> HTTPResponse:
+  def post(self, url: str, body: object, head: dict = None, **params: dict) -> HTTPResponse:
     """
     http POST method
+    :param head: request header
     :param url: URL
     :param body: post body. one object
     :param params: http request params
     :return:
     """
+    head['Content-Type'] = 'application/json'
     if body is None:
       raise HttpError('POST request\'s body can not be None')
     if params is not None:
       url += '?' + urlencode(params)
 
     return self.http.request('POST', url, body = json.dumps(body.__dict__),
-                             headers = {'Content-Type': 'application/json'})
+                             headers = head)
 
-  def delete(self, url: str, **params: dict) -> HTTPResponse:
+  def delete(self, url: str, head: dict, **params: dict) -> HTTPResponse:
     """
     http DELETE method
+    :param head: request header
     :param url: URL
     :param params: http request params
     :return:
     """
     if params is not None:
-      return self.http.request('DELETE', url, fields = params)
+      return self.http.request('DELETE', url, fields = params, headers = head)
     else:
-      return self.http.request('DELETE', url)
+      return self.http.request('DELETE', url, headers = head)

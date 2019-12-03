@@ -1,9 +1,10 @@
-import selfusepy, binascii
+import selfusepy, binascii, time
 from typing import List
 from jsontest.jsontest import One, One1
 from crc32 import crc32DO
 from bilibili.db import DBSession, engine
 from selfusepy.utils import Logger
+
 
 def json_test_1():
   """
@@ -32,11 +33,19 @@ if __name__ == '__main__':
   log = Logger().logger
   hashes: List[crc32DO] = []
   conn = engine.connect()
-  for i in range(660_0001, 10_0000_0000):
+  for i in range(9318_0001, 10_0000_0000):
     hashes.append(crc32DO(binascii.crc32(str(i).encode("utf-8")), i))
-    if i % 10_0000 == 0:
-      log.info('i: %s' % i)
+
+    if i % 6_0000 == 0:
+      log.info('i: %s' % (i))
+
       sql: str = "insert into crc32(hash, value) values %s" % (', '.join('%s' % item.__str__() for item in hashes))
       hashes.clear()
-      conn.execute(sql)
+
+      try:
+        conn.execute(sql)
+      except Exception as e:
+        log.exception(e)
+        exit(0)
+
       log.info('Done')

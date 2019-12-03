@@ -36,17 +36,17 @@ def parse_json(j: str, obj: T) -> T:
 req: Request = Request()
 
 
-def get(url: str, head: dict, **params: dict) -> HTTPResponse:
+def get(url: str, head: dict = None, **params: dict) -> HTTPResponse:
   return req.get(url, head, **params)
 
 
-def put(url: str, body: object = None, **params: dict) -> HTTPResponse:
-  return req.put(url, body, **params)
+def put(url: str, head: dict = None, body: object = None, **params: dict) -> HTTPResponse:
+  return req.put(url, body, head, **params)
 
 
-def post(url: str, body: object, **params: dict) -> HTTPResponse:
-  return req.post(url, body, **params)
+def post(url: str, body: object, head: dict = None, **params: dict) -> HTTPResponse:
+  return req.post(url, body, head, **params)
 
 
-def delete(url: str, **params: dict) -> HTTPResponse:
-  return req.delete(url, **params)
+def delete(url: str, head: dict = None, **params: dict) -> HTTPResponse:
+  return req.delete(url, head, **params)
