@@ -10,6 +10,7 @@
 可直接在__init__直接调用此工具库的实现
 来直接使用
 """
+import json
 from typing import List
 
 from selfusepy.utils import upper_first_letter
@@ -59,7 +60,7 @@ def add_classname(d: dict, classname: str) -> str:
       for item in v:
         add_classname(item, upper_first_letter(k))
 
-  return d.__str__().replace('\'', '\"')  # 需要替换默认dict导出的str为单引号的问题
+  return json.dumps(d)  # 需要替换默认dict导出的str为单引号的问题
 
 
 def generate_class_dict(obj: BaseJsonObject):

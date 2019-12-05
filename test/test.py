@@ -1,8 +1,8 @@
-import selfusepy, binascii, time
+import selfusepy, binascii
 from typing import List
 from jsontest.jsontest import One, One1
 from crc32 import crc32DO
-from bilibili.db import DBSession, engine
+from db import engine
 from selfusepy.utils import Logger
 
 
@@ -33,7 +33,7 @@ if __name__ == '__main__':
   log = Logger().logger
   hashes: List[crc32DO] = []
   conn = engine.connect()
-  for i in range(9318_0001, 10_0000_0000):
+  for i in range(3_1908_0001, 5_0000_0000):
     hashes.append(crc32DO(binascii.crc32(str(i).encode("utf-8")), i))
 
     if i % 6_0000 == 0:

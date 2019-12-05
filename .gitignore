@@ -2,3 +2,4 @@
 selfusepy.egg-info/
 dist/
 **/__pycache__/
+**/db.py
