@@ -7,7 +7,7 @@
 
 import json
 import selfusepy.jsonparse
-from typing import TypeVar
+from typing import TypeVar, List
 from selfusepy.url import Request, HTTPResponse
 
 T = TypeVar('T')
@@ -30,6 +30,19 @@ def parse_json(j: str, obj: T) -> T:
 
   jsonparse.class_dict.clear()
   return obj
+
+
+def parse_json_arrary(j: str, obj: T) -> List[T]:
+  """
+  todo needs to be optimized
+  Json array to List
+  """
+  l: list = json.loads(j)
+  res: List[T] = list()
+  for item in l:
+    temp: T = parse_json(json.dumps(item), obj)
+    res.append(temp)
+  return res
 
 
 req: Request = Request()

@@ -82,4 +82,4 @@ Json str
 }
 ```
 
-[json_test_cases]:test/jsontest/jsontest.py
+[json_test_cases]:test/jsontest/__init__.py

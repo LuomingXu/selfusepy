@@ -7,18 +7,25 @@
 
 import logging, sys, os
 from logging import handlers
+from typing import MutableMapping
 
 
 def override_str(clazz):
   """
-  todo override List.__str__()
   override default func __str__(), print Object like Java toString() style
   """
 
   def __str__(self):
-    return '%s[%s]' % (
+    values: MutableMapping = {}
+    for k, v in vars(self).items():
+      if isinstance(v, list):
+        values[k] = '[%s]' % ', '.join('%s' % item.__str__() for item in v)
+      else:
+        values[k] = v.__str__()
+
+    return '%s(%s)' % (
       type(self).__name__,  # class name
-      ', '.join('%s: %s' % item for item in vars(self).items())
+      ', '.join('%s: %s' % item for item in values.items())
     )
 
   clazz.__str__ = __str__
@@ -132,7 +139,7 @@ class LoggerFilter(logging.Filter):
 
 
 class RootPath(object):
-  """路径处理工具类"""
+  """获取根目录"""
 
   def __init__(self):
     # 判断调试模式
