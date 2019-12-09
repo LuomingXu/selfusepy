@@ -6,10 +6,9 @@
 #  CreateTime: 2019/11/26 20:45
 
 import json
+import selfusepy.jsonparse
 from typing import TypeVar
 from selfusepy.url import Request, HTTPResponse
-
-import selfusepy.jsonparse
 
 T = TypeVar('T')
 

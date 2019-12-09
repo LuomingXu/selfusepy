@@ -1,7 +1,7 @@
 from typing import List
 
 from selfusepy.jsonparse import BaseJsonObject
-from utils import override_str
+from selfusepy.utils import override_str
 
 
 @override_str

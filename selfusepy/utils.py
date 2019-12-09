@@ -5,8 +5,7 @@
 #  File Name : utils.py
 #  CreateTime: 2019/11/26 20:45
 
-import logging
-import sys
+import logging, sys, os
 from logging import handlers
 
 
@@ -81,7 +80,7 @@ class Logger(object):
   """
 
   def __init__(self, filename = None, when = 'D', backCount = 3,
-               fmt = '%(asctime)s - [%(levelname)8s] - [%(threadName)20s] %(module)10s.%(funcName)s - %(filename)s[line:%(lineno)d] : %(message)s'):
+               fmt = '%(asctime)s - [%(levelname)8s] - [%(threadName)20s] %(pathname)30s.%(funcName)s[line(%(lineno)d)]: %(message)s'):
     """
     init
     :param filename: 储存日志的文件, 为None的话就是不储存日志到文件
@@ -95,6 +94,7 @@ class Logger(object):
     sh = logging.StreamHandler()  # 控制台输出
     sh.setFormatter(format_str)
     self.logger.addHandler(sh)
+    self.logger.addFilter(LoggerFilter())
 
     if filename is not None:
       """实例化TimedRotatingFileHandler"""
@@ -111,3 +111,49 @@ def upper_first_letter(s: str) -> str:
   :return:
   """
   return s[0].capitalize() + s[1:]
+
+
+class LoggerFilter(logging.Filter):
+  def filter(self, record: logging.LogRecord):
+    s = str(record.pathname).replace(RootPath().rootPath, '').replace('/', '.')[1:]
+    if s.__len__() > 30:  # 如果超出了长度再进行缩减操作
+      l: list = s.split('.')
+      for i, item in enumerate(l):
+        if i != l.__len__() - 1:  # 最后一个文件名不进行长度判断
+          s = str(item)
+          if s.__len__() > 10:  # 对过长的包名进行缩减
+            s = s.replace('_', '')  # 如果是以'_'开头的, 需要删去, 才能取首字母
+            l[i] = s[0]
+
+      s = '.'.join('%s' % item for item in l)
+
+    record.pathname = s
+    return True
+
+
+class RootPath(object):
+  """路径处理工具类"""
+
+  def __init__(self):
+    # 判断调试模式
+    debug_vars = dict((a, b) for a, b in os.environ.items()
+                      if a.find('IPYTHONENABLE') >= 0)
+
+    # 根据不同场景获取根目录
+    if len(debug_vars) > 0:
+      """当前为debug运行时"""
+      self.rootPath = sys.path[2]
+    elif getattr(sys, 'frozen', False):
+      """当前为exe运行时"""
+      self.rootPath = os.getcwd()
+    else:
+      """正常执行"""
+      self.rootPath = sys.path[1]
+
+    # 替换斜杠
+    self.rootPath = self.rootPath.replace("\\", "/")
+
+  def getPathFromResources(self, fileName):
+    """按照文件名拼接资源文件路径"""
+    filePath = "%s/resources/%s" % (self.rootPath, fileName)
+    return filePath
