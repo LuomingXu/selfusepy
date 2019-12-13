@@ -1,5 +1,3 @@
-# encoding:utf-8
-
 from setuptools import setup, find_packages
 
 with open("README.md", "r") as fh:
@@ -7,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
   name = 'selfusepy',
-  version = '0.0.3',
+  version = '0.0.5',
   author = 'Luoming Xu',
   author_email = 'xjy46566696@gmail.com',
   description = 'Self-Use Python lib',
