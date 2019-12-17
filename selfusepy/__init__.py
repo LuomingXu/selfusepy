@@ -52,7 +52,15 @@ def get(url: str, head: dict = None, **params: dict) -> HTTPResponse:
   return req.get(url, head, **params)
 
 
+async def get_async(url: str, head: dict = None, **params: dict) -> HTTPResponse:
+  return req.get(url, head, **params)
+
+
 def put(url: str, head: dict = None, body: object = None, **params: dict) -> HTTPResponse:
+  return req.put(url, body, head, **params)
+
+
+async def put_async(url: str, head: dict = None, body: object = None, **params: dict) -> HTTPResponse:
   return req.put(url, body, head, **params)
 
 
@@ -60,5 +68,13 @@ def post(url: str, body: object, head: dict = None, **params: dict) -> HTTPRespo
   return req.post(url, body, head, **params)
 
 
+async def post_async(url: str, body: object, head: dict = None, **params: dict) -> HTTPResponse:
+  return req.post(url, body, head, **params)
+
+
 def delete(url: str, head: dict = None, **params: dict) -> HTTPResponse:
+  return req.delete(url, head, **params)
+
+
+async def delete_async(url: str, head: dict = None, **params: dict) -> HTTPResponse:
   return req.delete(url, head, **params)

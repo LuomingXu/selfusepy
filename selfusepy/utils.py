@@ -122,7 +122,7 @@ def upper_first_letter(s: str) -> str:
 
 class LoggerFilter(logging.Filter):
   def filter(self, record: logging.LogRecord):
-    s = str(record.pathname).replace(RootPath().rootPath, '').replace('/', '.')[1:]
+    s = str(record.pathname).replace('\\', '/') .replace(RootPath().rootPath, '').replace('/', '.')[1:]
     if s.__len__() > 30:  # 如果超出了长度再进行缩减操作
       l: list = s.split('.')
       for i, item in enumerate(l):
@@ -158,7 +158,7 @@ class RootPath(object):
       self.rootPath = sys.path[1]
 
     # 替换斜杠
-    self.rootPath = self.rootPath.replace("\\", "/")
+    self.rootPath = self.rootPath.replace('\\', '/')
 
   def getPathFromResources(self, fileName):
     """按照文件名拼接资源文件路径"""
