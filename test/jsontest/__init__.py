@@ -1,5 +1,6 @@
-import selfusepy
 from typing import List
+
+import selfusepy
 from selfusepy.jsonparse import BaseJsonObject
 from selfusepy.utils import override_str
 
@@ -36,7 +37,7 @@ class One1(BaseJsonObject):
       self.y: str = ''
 
 
-def json_test_1():
+def json_test_1() -> bool:
   """
   json test
   e.g. 1
@@ -45,9 +46,11 @@ def json_test_1():
   f = open('./jsontest/eg1.json', 'r')
   obj: One = selfusepy.parse_json(f.read(), One())
   print(obj)
+  f.close()
+  return isinstance(obj, One)
 
 
-def json_test_2():
+def json_test_2() -> bool:
   """
   json test with jsonarray
   e.g. 2
@@ -56,15 +59,19 @@ def json_test_2():
   f = open('./jsontest/eg2.json', 'r')
   obj: One1 = selfusepy.parse_json(f.read(), One1())
   print(obj)
+  f.close()
+  return isinstance(obj, One1)
 
 
-def json_test_3():
+def json_test_3() -> (bool, bool):
   """
   json test, parse jsonArrary
   e.g. 3
   """
   print('json array测试: ')
-  f = open('./jsontest/eg3.json')
+  f = open('./jsontest/eg3.json', 'r')
   l: List[One] = selfusepy.parse_json_arrary(f.read(), One())
   for i, item in enumerate(l):
     print('i: %s, value: %s' % (i, item))
+  f.close()
+  return isinstance(l, list), isinstance(l.pop(0), One)

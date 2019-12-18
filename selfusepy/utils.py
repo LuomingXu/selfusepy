@@ -5,9 +5,11 @@
 #  File Name : utils.py
 #  CreateTime: 2019/11/26 20:45
 
-import logging, sys, os
+import logging
+import os
+import sys
 from logging import handlers
-from typing import MutableMapping
+from typing import MutableMapping, List
 
 
 def override_str(clazz):
@@ -87,7 +89,7 @@ class Logger(object):
   """
 
   def __init__(self, filename = None, when = 'D', backCount = 3,
-               fmt = '%(asctime)s - [%(levelname)8s] - [%(threadName)20s] %(pathname)30s.%(funcName)s[line(%(lineno)d)]: %(message)s'):
+               fmt = '%(asctime)s-[%(levelname)8s]-[%(threadName)15s] %(customPathname)50s(%(lineno)d): %(message)s'):
     """
     init
     :param filename: 储存日志的文件, 为None的话就是不储存日志到文件
@@ -121,20 +123,41 @@ def upper_first_letter(s: str) -> str:
 
 
 class LoggerFilter(logging.Filter):
+
+  def __s_len__(self, l: List[str]):
+    len: int = 0
+    for item in l:
+      len += item.__len__() + 1
+    return len
+
+  def __replace_underline__(self, l: List[str]):
+    for i, item in enumerate(l):
+      l[i] = item.replace('_', '')
+
   def filter(self, record: logging.LogRecord):
-    s = str(record.pathname).replace('\\', '/') .replace(RootPath().rootPath, '').replace('/', '.')[1:]
-    if s.__len__() > 30:  # 如果超出了长度再进行缩减操作
-      l: list = s.split('.')
-      for i, item in enumerate(l):
-        if i != l.__len__() - 1:  # 最后一个文件名不进行长度判断
-          s = str(item)
-          if s.__len__() > 10:  # 对过长的包名进行缩减
-            s = s.replace('_', '')  # 如果是以'_'开头的, 需要删去, 才能取首字母
-            l[i] = s[0]
+    s = str(record.pathname).replace('\\', '/').replace(RootPath().rootPath, '').replace('/', '.')[1:]
+    l: List[str] = s.split('.')
+    l.pop(l.__len__() - 1)  # 丢弃最后的文件扩展名'py'
+    file_name = l.pop(l.__len__() - 1)
+    self.__replace_underline__(l)  # 有些py文件以'_'开头, 需要删去, 才能取首字母
+    i: int = 0
+    while self.__s_len__(l) + file_name.__len__() + record.funcName.__len__() > 50:  # 如果超出了长度再进行缩减操作
+      if i >= l.__len__():  # 实在太长了缩减不了, 就算了, 需要保证最后的文件名与函数名的完整
+        break
+      l[i] = l[i][0]
+      i += 1
 
-      s = '.'.join('%s' % item for item in l)
+    l.append(file_name)
+    l.append(record.funcName)
 
-    record.pathname = s
+    record.customPathname = '.'.join('%s' % item for item in l)
+    """
+    不能在这边直接就修改
+    >>>record.pathname = '.'.join('%s' % item for item in l)
+    有可能后面的log依赖这个pathname, 那么这个pathname就被修改了, 
+    而没有被系统重新赋予正确的pathname
+    例如test.log包中的层级__init__, 就会出现这种问题
+    """
     return True
 
 
@@ -164,3 +187,29 @@ class RootPath(object):
     """按照文件名拼接资源文件路径"""
     filePath = "%s/resources/%s" % (self.rootPath, fileName)
     return filePath
+
+
+def lookahead(iterable):
+  """
+  Pass through all values from the given iterable, augmented by the
+  information if there are more values to come after the current one
+  (True), or if it is the last value (False).
+  collect from: https://stackoverflow.com/a/1630350
+  >>>from selfusepy.utils import lookahead
+  >>>from typing import List
+  >>>c: List[int] = list()
+  >>>for item, has_next in lookahead(c):
+  >>>  if not has_next:
+  >>>    # do something for last item
+  >>>  # other item
+  """
+  # Get an iterator and pull the first value.
+  it = iter(iterable)
+  last = next(it)
+  # Run the iterator to exhaustion (starting from the second value).
+  for val in it:
+    # Report the *previous* value (more to come).
+    yield last, True
+    last = val
+  # Report the last value.
+  yield last, False
