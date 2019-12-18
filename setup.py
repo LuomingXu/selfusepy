@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
   name = 'selfusepy',
-  version = '0.0.5',
+  version = '0.0.6',
   author = 'Luoming Xu',
   author_email = 'xjy46566696@gmail.com',
   description = 'Self-Use Python lib',

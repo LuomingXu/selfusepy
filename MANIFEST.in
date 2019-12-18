@@ -4,5 +4,8 @@ include *.md
 # Include the license file
 include LICENSE
 
+# Include image
+include *.png
+
 # Exclude test dir
 prune test*
