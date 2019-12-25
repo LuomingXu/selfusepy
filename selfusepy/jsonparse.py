@@ -25,6 +25,8 @@ from typing import List
 
 from selfusepy.utils import upper_first_letter
 
+__all__ = ['BaseJsonObject', 'JSONField']
+
 class_dict = {}
 
 __classname__: str = '__classname__'
@@ -38,19 +40,36 @@ class BaseJsonObject(object):
   pass
 
 
-def JSONField(var_key: dict):
-  def variableName_to_jsonKey(cls):
-    class NoUseClass(object):
+def JSONField(key_variable: dict):
+  def func(clazz):
+    def json_key_to_variable_name(self, k: str):
+      return key_variable.get(k)
+
+    clazz.json_key_to_variable_name = json_key_to_variable_name
+    return clazz
+
+  return func
+
+
+"""
+Archive
+```python
+def JSONField(key_variable: dict):
+  def func(cls):
+    @override_str
+    class NoUseClass(BaseJsonObject):
       def __init__(self, *args, **kwargs):
-        pass
+        self = cls(*args, **kwargs)
 
       @classmethod
-      def key(cls, k: str):
-        return var_key.get(k)
+      def json_key_2_variable_name(cls, k: str):
+        return key_variable.get(k)
 
     return NoUseClass
 
-  return variableName_to_jsonKey
+  return func
+```
+"""
 
 
 def deserialize_object(d: dict) -> object:
@@ -63,7 +82,13 @@ def deserialize_object(d: dict) -> object:
   if cls:
     cls = class_dict[cls]
     obj = cls.__new__(cls)  # Make instance without calling __init__
+    flag = hasattr(obj, 'json_key_to_variable_name')
     for key, value in d.items():
+      if flag:
+        name = obj.json_key_to_variable_name(key)
+        if name is not None:
+          setattr(obj, name, value)
+          continue
       setattr(obj, key, value)
     return obj
   else:

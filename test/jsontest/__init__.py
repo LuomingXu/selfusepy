@@ -1,7 +1,7 @@
 from typing import List
 
 import selfusepy
-from selfusepy.jsonparse import BaseJsonObject
+from selfusepy.jsonparse import BaseJsonObject, JSONField
 from selfusepy.utils import override_str
 
 
@@ -35,6 +35,28 @@ class One1(BaseJsonObject):
   class Two(BaseJsonObject):
     def __init__(self):
       self.y: str = ''
+
+
+@override_str
+@JSONField({'x--': 'x'})
+class One2(BaseJsonObject):
+
+  def __init__(self):
+    self.x: str = ''
+    self.two: One2.Two = One2.Two()
+
+  @override_str
+  @JSONField({'y--': 'y'})
+  class Two(BaseJsonObject):
+    def __init__(self):
+      self.y: str = ''
+      self.three: One2.Two.Three = One2.Two.Three()
+
+    @override_str
+    @JSONField({'z--': 'z'})
+    class Three(BaseJsonObject):
+      def __init__(self):
+        self.z: str = ''
 
 
 def json_test_1() -> bool:
@@ -75,3 +97,16 @@ def json_test_3() -> (bool, bool):
     print('i: %s, value: %s' % (i, item))
   f.close()
   return isinstance(l, list), isinstance(l.pop(0), One)
+
+
+def json_test_4() -> bool:
+  """
+  json test, json-key is different from variable name
+  e.g. 3
+  """
+  print('json不同变量名测试: ')
+  f = open('./jsontest/eg4.json', 'r')
+  obj: One2 = selfusepy.parse_json(f.read(), One2())
+  print(obj)
+  f.close()
+  return isinstance(obj, One2)

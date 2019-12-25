@@ -1,7 +1,7 @@
 Self-Use Python Lib
 =
 
-[![image](https://img.shields.io/badge/pypi-v0.0.6-green.svg?logo=python)](https://pypi.org/project/selfusepy/)
+[![image](https://img.shields.io/badge/pypi-v0.0.7-green.svg?logo=python)](https://pypi.org/project/selfusepy/)
 [![image](https://img.shields.io/badge/License-Apache__v2-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 
 ### DirTree
@@ -83,6 +83,44 @@ Json str
       "y": "y2"
     }
   ]
+}
+```
+
+#### e.g. 4
+```python
+from selfusepy.jsonparse import JSONField, BaseJsonObject
+from selfusepy.utils import override_str
+@override_str
+@JSONField({'x--': 'x'})
+class One2(BaseJsonObject):
+
+  def __init__(self):
+    self.x: str = ''
+    self.two: One2.Two = One2.Two()
+
+  @override_str
+  @JSONField({'y--': 'y'})
+  class Two(BaseJsonObject):
+    def __init__(self):
+      self.y: str = ''
+      self.three: One2.Two.Three = One2.Two.Three()
+
+    @override_str
+    @JSONField({'z--': 'z'})
+    class Three(BaseJsonObject):
+      def __init__(self):
+        self.z: str = ''
+```
+Json str
+```json
+{
+  "x--": "x",
+  "two": {
+    "y--": "y",
+    "three": {
+      "z--": "z"
+    }
+  }
 }
 ```
 

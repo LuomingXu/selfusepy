@@ -5,7 +5,8 @@ with open("README.md", "r") as fh:
 
 setup(
   name = 'selfusepy',
-  version = '0.0.6',
+  version = '0.0.7',
+  license = 'Apache-2.0',
   author = 'Luoming Xu',
   author_email = 'xjy46566696@gmail.com',
   description = 'Self-Use Python lib',
@@ -14,7 +15,7 @@ setup(
   url = 'https://github.com/LuomingXu/selfusepy',
   packages = find_packages(),
   classifiers = [
-    'Development Status :: 1 - Planning',
+    'Development Status :: 3 - Alpha',
     'Intended Audience :: Customer Service',
     'Programming Language :: Python :: 3.7',
     'License :: OSI Approved :: Apache Software License',
