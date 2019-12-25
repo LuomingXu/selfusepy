@@ -70,7 +70,7 @@ def json_test_3() -> (bool, bool):
   """
   print('json array测试: ')
   f = open('./jsontest/eg3.json', 'r')
-  l: List[One] = selfusepy.parse_json_arrary(f.read(), One())
+  l: List[One] = selfusepy.parse_json_array(f.read(), One())
   for i, item in enumerate(l):
     print('i: %s, value: %s' % (i, item))
   f.close()

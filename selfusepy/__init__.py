@@ -36,23 +36,23 @@ def parse_json(j: str, obj: T) -> T:
 
   jsonparse.generate_class_dict(obj)
   json_dict: dict = json.loads(j)
-  j_modified: str = jsonparse.add_classname(json_dict, type(obj).__name__)
-  obj = json.loads(j_modified, object_hook = jsonparse.deserialize_object)
+  j_modified: str = json.dumps(jsonparse.add_classname(json_dict, type(obj).__name__))
+  res = json.loads(j_modified, object_hook = jsonparse.deserialize_object)
 
   jsonparse.class_dict.clear()
-  return obj
+  return res
 
 
-def parse_json_arrary(j: str, obj: T) -> List[T]:
+def parse_json_array(j: str, obj: T) -> List[T]:
   """
-  todo needs to be optimized
   Json array to List
   """
-  l: list = json.loads(j)
-  res: List[T] = list()
-  for item in l:
-    temp: T = parse_json(json.dumps(item), obj)
-    res.append(temp)
+  jsonparse.generate_class_dict(obj)
+  json_list: list = json.loads(j)
+  j_modified: str = json.dumps(jsonparse.add_classname_list(json_list, type(obj).__name__))
+  res = json.loads(j_modified, object_hook = jsonparse.deserialize_object)
+
+  jsonparse.class_dict.clear()
   return res
 
 

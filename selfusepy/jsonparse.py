@@ -21,7 +21,6 @@
 可直接在__init__直接调用此工具库的实现
 来直接使用
 """
-import json
 from typing import List
 
 from selfusepy.utils import upper_first_letter
@@ -37,6 +36,21 @@ class BaseJsonObject(object):
   以是否为此基类的子类来判断这个类是否需要转化
   """
   pass
+
+
+def JSONField(var_key: dict):
+  def variableName_to_jsonKey(cls):
+    class NoUseClass(object):
+      def __init__(self, *args, **kwargs):
+        pass
+
+      @classmethod
+      def key(cls, k: str):
+        return var_key.get(k)
+
+    return NoUseClass
+
+  return variableName_to_jsonKey
 
 
 def deserialize_object(d: dict) -> object:
@@ -56,7 +70,7 @@ def deserialize_object(d: dict) -> object:
     return d
 
 
-def add_classname(d: dict, classname: str) -> str:
+def add_classname(d: dict, classname: str) -> dict:
   """
   给json字符串添加一个"__classname__"的key来作为转化的标志
   :param d: json的字典
@@ -71,7 +85,13 @@ def add_classname(d: dict, classname: str) -> str:
       for item in v:
         add_classname(item, upper_first_letter(k))
 
-  return json.dumps(d)  # 需要替换默认dict导出的str为单引号的问题
+  return d
+
+
+def add_classname_list(l: list, classname: str) -> list:
+  for d in l:
+    add_classname(d, classname)
+  return l
 
 
 def generate_class_dict(obj: BaseJsonObject):
