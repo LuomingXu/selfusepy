@@ -115,7 +115,7 @@ class Logger(object):
     :param backCount: 备份文件的个数, 如果超过这个个数, 就会自动删除
     :param fmt: 日志格式
     """
-    self.logger = logging.getLogger(filename)
+    self.logger = logging.Logger(filename)
     format_str = logging.Formatter(fmt)
     self.logger.setLevel(logging.DEBUG)  # 设置日志级别为debug, 所有的log都可以打印出来
     sh = logging.StreamHandler()  # 控制台输出
