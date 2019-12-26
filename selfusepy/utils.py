@@ -23,6 +23,13 @@ from logging import handlers
 from typing import MutableMapping, List
 
 
+def eprint(*args, sep = ' ', end = '\n', file = sys.stderr):
+  """
+  collect from: https://stackoverflow.com/questions/5574702/how-to-print-to-stderr-in-python
+  """
+  print(*args, sep = sep, end = end, file = file)
+
+
 def override_str(clazz):
   """
   override default func __str__(), print Object like Java toString() style
