@@ -142,24 +142,24 @@ def upper_first_letter(s: str) -> str:
 
 class LoggerFilter(logging.Filter):
 
-  def __s_len__(self, l: List[str]):
+  def _s_len(self, l: List[str]):
     len: int = 0
     for item in l:
       len += item.__len__() + 1
     return len
 
-  def __replace_underline__(self, l: List[str]):
+  def _replace_underline(self, l: List[str]):
     for i, item in enumerate(l):
       l[i] = item.replace('_', '')
 
   def filter(self, record: logging.LogRecord):
-    s = str(record.pathname).replace('\\', '/').replace(RootPath().rootPath, '').replace('/', '.')[1:]
+    s = str(record.pathname).replace('\\', '/').replace(RootPath().root_path, '').replace('/', '.')[1:]
     l: List[str] = s.split('.')
     l.pop(l.__len__() - 1)  # 丢弃最后的文件扩展名'py'
     file_name = l.pop(l.__len__() - 1)
-    self.__replace_underline__(l)  # 有些py文件以'_'开头, 需要删去, 才能取首字母
+    self._replace_underline(l)  # 有些py文件以'_'开头, 需要删去, 才能取首字母
     i: int = 0
-    while self.__s_len__(l) + file_name.__len__() + record.funcName.__len__() > 50:  # 如果超出了长度再进行缩减操作
+    while self._s_len(l) + file_name.__len__() + record.funcName.__len__() > 50:  # 如果超出了长度再进行缩减操作
       if i >= l.__len__():  # 实在太长了缩减不了, 就算了, 需要保证最后的文件名与函数名的完整
         break
       l[i] = l[i][0]
@@ -174,37 +174,34 @@ class LoggerFilter(logging.Filter):
     >>>record.pathname = '.'.join('%s' % item for item in l)
     有可能后面的log依赖这个pathname, 那么这个pathname就被修改了, 
     而没有被系统重新赋予正确的pathname
-    例如test.log包中的层级__init__, 就会出现这种问题
+    例如test.log包中的多层级__init__, 就会出现这种问题
     """
     return True
 
 
 class RootPath(object):
   """获取根目录"""
+  root_path = None
 
   def __init__(self):
-    # 判断调试模式
-    debug_vars = dict((a, b) for a, b in os.environ.items()
-                      if a.find('IPYTHONENABLE') >= 0)
+    if RootPath.root_path == None:
+      # 判断调试模式
+      debug_vars = dict((a, b) for a, b in os.environ.items()
+                        if a.find('IPYTHONENABLE') >= 0)
 
-    # 根据不同场景获取根目录
-    if len(debug_vars) > 0:
-      """当前为debug运行时"""
-      self.rootPath = sys.path[2]
-    elif getattr(sys, 'frozen', False):
-      """当前为exe运行时"""
-      self.rootPath = os.getcwd()
-    else:
-      """正常执行"""
-      self.rootPath = sys.path[1]
+      # 根据不同场景获取根目录
+      if len(debug_vars) > 0:
+        """当前为debug运行时"""
+        RootPath.root_path = sys.path[2]
+      elif getattr(sys, 'frozen', False):
+        """当前为exe运行时"""
+        RootPath.root_path = os.getcwd()
+      else:
+        """正常执行"""
+        RootPath.root_path = sys.path[1]
 
-    # 替换斜杠
-    self.rootPath = self.rootPath.replace('\\', '/')
-
-  def getPathFromResources(self, fileName):
-    """按照文件名拼接资源文件路径"""
-    filePath = "%s/resources/%s" % (self.rootPath, fileName)
-    return filePath
+      # 替换斜杠
+      RootPath.root_path = RootPath.root_path.replace('\\', '/')
 
 
 def lookahead(iterable):
