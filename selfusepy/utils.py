@@ -22,6 +22,8 @@ import sys
 from logging import handlers
 from typing import MutableMapping, List
 
+from log_timedelta import LogTimeUTCOffset
+
 
 def eprint(*args, sep = ' ', end = '\n', file = sys.stderr):
   """
@@ -106,15 +108,17 @@ class Logger(object):
          log.info('info')
   """
 
-  def __init__(self, filename = None, when = 'D', backCount = 3,
+  def __init__(self, filename = None, time_offset: LogTimeUTCOffset = LogTimeUTCOffset.UTC8, when = 'D', backCount = 3,
                fmt = '%(asctime)s-[%(levelname)8s]-[%(threadName)15s] %(customPathname)50s(%(lineno)d): %(message)s'):
     """
     init
     :param filename: 储存日志的文件, 为None的话就是不储存日志到文件
     :param when: 间隔的时间单位. S秒, M分, H小时, D天, W每星期(interval==0时代表星期一) midnight 每天凌晨
     :param backCount: 备份文件的个数, 如果超过这个个数, 就会自动删除
+    :param time_offset: log的时间, 默认为UTC+8
     :param fmt: 日志格式
     """
+    logging.Formatter.converter = time_offset
     self.logger = logging.Logger(filename)
     format_str = logging.Formatter(fmt)
     self.logger.setLevel(logging.DEBUG)  # 设置日志级别为debug, 所有的log都可以打印出来
