@@ -1,4 +1,4 @@
-from selfusepy.utils import Logger
+from selfusepy.log import Logger
 
 
 def log_test():

@@ -16,13 +16,9 @@
 #  File Name : utils.py
 #  Repo: https://github.com/LuomingXu/selfusepy
 
-import logging
 import os
 import sys
-from logging import handlers
 from typing import MutableMapping, List
-
-from log_timedelta import LogTimeUTCOffset
 
 
 def eprint(*args, sep = ' ', end = '\n', file = sys.stderr):
@@ -101,40 +97,6 @@ class ShowProcess(object):
     self.i = 0
 
 
-class Logger(object):
-  """
-  日志类
-  usage: log = Logger('error.log').logger OR log = Logger().logger
-         log.info('info')
-  """
-
-  def __init__(self, filename = None, time_offset: LogTimeUTCOffset = LogTimeUTCOffset.UTC8, when = 'D', backCount = 3,
-               fmt = '%(asctime)s-[%(levelname)8s]-[%(threadName)15s] %(customPathname)50s(%(lineno)d): %(message)s'):
-    """
-    init
-    :param filename: 储存日志的文件, 为None的话就是不储存日志到文件
-    :param when: 间隔的时间单位. S秒, M分, H小时, D天, W每星期(interval==0时代表星期一) midnight 每天凌晨
-    :param backCount: 备份文件的个数, 如果超过这个个数, 就会自动删除
-    :param time_offset: log的时间, 默认为UTC+8
-    :param fmt: 日志格式
-    """
-    logging.Formatter.converter = time_offset
-    self.logger = logging.Logger(filename)
-    format_str = logging.Formatter(fmt)
-    self.logger.setLevel(logging.DEBUG)  # 设置日志级别为debug, 所有的log都可以打印出来
-    sh = logging.StreamHandler()  # 控制台输出
-    sh.setFormatter(format_str)
-    self.logger.addHandler(sh)
-    self.logger.addFilter(LoggerFilter())
-
-    if filename is not None:
-      """实例化TimedRotatingFileHandler"""
-      th = handlers.TimedRotatingFileHandler(filename = filename, when = when, backupCount = backCount,
-                                             encoding = 'utf-8')
-      th.setFormatter(format_str)  # 设置文件里写入的格式
-      self.logger.addHandler(th)
-
-
 def upper_first_letter(s: str) -> str:
   """
   make first letter upper case
@@ -142,45 +104,6 @@ def upper_first_letter(s: str) -> str:
   :return:
   """
   return s[0].capitalize() + s[1:]
-
-
-class LoggerFilter(logging.Filter):
-
-  def _s_len(self, l: List[str]):
-    len: int = 0
-    for item in l:
-      len += item.__len__() + 1
-    return len
-
-  def _replace_underline(self, l: List[str]):
-    for i, item in enumerate(l):
-      l[i] = item.replace('_', '')
-
-  def filter(self, record: logging.LogRecord):
-    s = str(record.pathname).replace('\\', '/').replace(RootPath().root_path, '').replace('/', '.')[1:]
-    l: List[str] = s.split('.')
-    l.pop(l.__len__() - 1)  # 丢弃最后的文件扩展名'py'
-    file_name = l.pop(l.__len__() - 1)
-    self._replace_underline(l)  # 有些py文件以'_'开头, 需要删去, 才能取首字母
-    i: int = 0
-    while self._s_len(l) + file_name.__len__() + record.funcName.__len__() > 50:  # 如果超出了长度再进行缩减操作
-      if i >= l.__len__():  # 实在太长了缩减不了, 就算了, 需要保证最后的文件名与函数名的完整
-        break
-      l[i] = l[i][0]
-      i += 1
-
-    l.append(file_name)
-    l.append(record.funcName)
-
-    record.customPathname = '.'.join('%s' % item for item in l)
-    """
-    不能在这边直接就修改
-    >>>record.pathname = '.'.join('%s' % item for item in l)
-    有可能后面的log依赖这个pathname, 那么这个pathname就被修改了, 
-    而没有被系统重新赋予正确的pathname
-    例如test.log包中的多层级__init__, 就会出现这种问题
-    """
-    return True
 
 
 class RootPath(object):
