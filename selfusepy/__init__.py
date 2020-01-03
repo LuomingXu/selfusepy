@@ -21,6 +21,8 @@ import selfusepy.jsonparse
 from typing import TypeVar, List
 from selfusepy.url import Request, HTTPResponse
 
+__version__ = '0.0.11'
+
 T = TypeVar('T')
 
 

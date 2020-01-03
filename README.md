@@ -1,7 +1,7 @@
 Self-Use Python Lib
 =
 
-[![image](https://img.shields.io/badge/pypi-v0.0.9-green.svg?logo=python)](https://pypi.org/project/selfusepy/)
+[![image](https://img.shields.io/badge/pypi-v0.0.11-green.svg?logo=python)](https://pypi.org/project/selfusepy/)
 [![image](https://img.shields.io/badge/License-Apache__v2-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 
 ### DirTree
