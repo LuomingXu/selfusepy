@@ -17,13 +17,23 @@
 #  Repo: https://github.com/LuomingXu/selfusepy
 
 import json
-import selfusepy.jsonparse
+from datetime import datetime, timezone, timedelta
 from typing import TypeVar, List
+
+import selfusepy.jsonparse
 from selfusepy.url import Request, HTTPResponse
 
 __version__ = '0.0.11'
 
 T = TypeVar('T')
+
+
+def fromtimestamp(timestamp: float, offset: int) -> datetime:
+  return datetime.fromtimestamp(timestamp, timezone(timedelta(hours = offset)))
+
+
+def now(offset: int):
+  return datetime.now(timezone(timedelta(hours = offset)))
 
 
 def parse_json(j: str, obj: T) -> T:
