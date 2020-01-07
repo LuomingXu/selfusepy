@@ -21,14 +21,14 @@
 可直接在__init__直接调用此工具库的实现
 来直接使用
 """
-from typing import List
+from typing import MutableMapping, TypeVar
 
 from selfusepy.utils import upper_first_letter
 
-__all__ = ['BaseJsonObject', 'JSONField']
+__all__ = ['BaseJsonObject', 'DeserializeConfig', 'JsonField']
 
+T = TypeVar('T')
 class_dict = {}
-
 __classname__: str = '__classname__'
 
 
@@ -40,12 +40,24 @@ class BaseJsonObject(object):
   pass
 
 
-def JSONField(key_variable: dict):
-  def func(clazz):
-    def json_key_to_variable_name(self, k: str):
-      return key_variable.get(k)
+class JsonField(object):
 
-    clazz.json_key_to_variable_name = json_key_to_variable_name
+  def __init__(self, varname: str = None, ignore: bool = False):
+    self.varname: str = varname  # object's var's name
+    self.ignore: bool = ignore  # do not convert this field
+
+
+def DeserializeConfig(_map: MutableMapping[str, JsonField]):
+  """
+  :param _map: key->json key, value->annotation
+  :return:
+  """
+
+  def func(clazz):
+    def get_annotation(self, k: str = None) -> JsonField or MutableMapping[str, JsonField]:
+      return _map.get(k) if k else _map
+
+    clazz.get_annotation = get_annotation
     return clazz
 
   return func
@@ -78,17 +90,20 @@ def deserialize_object(d: dict) -> object:
   :param d: json转化过程中的字典
   :return: object
   """
-  cls = d.pop(__classname__, None)
+  cls_name = d.pop(__classname__, None)
+  cls = class_dict.get(cls_name)
   if cls:
-    cls = class_dict[cls]
     obj = cls.__new__(cls)  # Make instance without calling __init__
-    flag = hasattr(obj, 'json_key_to_variable_name')
+    flag = hasattr(obj, 'get_annotation')
     for key, value in d.items():
-      if flag:
-        name = obj.json_key_to_variable_name(key)
-        if name is not None:
-          setattr(obj, name, value)
-          continue
+      if flag:  # 判断是否有JSONField注解
+        res: JsonField = obj.get_annotation(key)
+        if res:  # 判断这个key是否配置了注解
+          if res.ignore:
+            continue
+          if res.varname is not None:
+            setattr(obj, res.varname, value)
+            continue
       setattr(obj, key, value)
     return obj
   else:
@@ -100,13 +115,13 @@ def add_classname(d: dict, classname: str) -> dict:
   给json字符串添加一个"__classname__"的key来作为转化的标志
   :param d: json的字典
   :param classname: 转化的目标类
-  :return: 修改完后的json字符串
+  :return: 修改完后的json dict
   """
   d[__classname__] = classname
   for k, v in d.items():
     if isinstance(v, dict):
       add_classname(v, upper_first_letter(k))
-    elif isinstance(v, List):
+    elif isinstance(v, list):
       for item in v:
         add_classname(item, upper_first_letter(k))
 
@@ -131,7 +146,7 @@ def generate_class_dict(obj: BaseJsonObject):
     cls = type(item)
     if issubclass(cls, BaseJsonObject):
       generate_class_dict(cls())
-    elif issubclass(cls, List):
+    elif issubclass(cls, list):
       cls = type(item.pop(0))
       if issubclass(cls, BaseJsonObject):
         generate_class_dict(cls())

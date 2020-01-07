@@ -21,6 +21,7 @@ from datetime import datetime, timezone, timedelta
 from typing import TypeVar, List
 
 import selfusepy.jsonparse
+import selfusepy.utils as utils
 from selfusepy.url import Request, HTTPResponse
 
 __version__ = '0.0.11'
@@ -66,6 +67,32 @@ def parse_json_array(j: str, obj: T) -> List[T]:
 
   jsonparse.class_dict.clear()
   return res
+
+
+def dict_2_obj(d: dict, obj: T) -> T:
+  """
+  todo fully test
+  :param d:
+  :param obj:
+  :return:
+  """
+  if isinstance(obj, dict):
+    obj.update(d)
+  else:
+    for key, value in d.items():
+      if isinstance(value, dict):
+        obj_value = getattr(obj, utils.upper_first_letter(key), None)
+        dict_2_obj(value, obj_value)
+      elif isinstance(value, list):
+        obj_value = getattr(obj, key, None)
+        assert type(obj_value) == list
+        cls = type(obj_value.pop(0))
+        for item in value:
+          obj_value.append(dict_2_obj(item, cls.__new__(cls)))
+      else:
+        setattr(obj, key, value)
+
+  return obj
 
 
 req: Request = Request()

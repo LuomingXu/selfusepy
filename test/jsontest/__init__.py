@@ -1,7 +1,7 @@
 from typing import List
 
 import selfusepy
-from selfusepy.jsonparse import BaseJsonObject, JSONField
+from selfusepy.jsonparse import BaseJsonObject, DeserializeConfig, JsonField
 from selfusepy.utils import override_str
 
 
@@ -38,7 +38,7 @@ class One1(BaseJsonObject):
 
 
 @override_str
-@JSONField({'x--': 'x'})
+@DeserializeConfig({'x--': JsonField(varname = 'x')})
 class One2(BaseJsonObject):
 
   def __init__(self):
@@ -46,14 +46,14 @@ class One2(BaseJsonObject):
     self.two: One2.Two = One2.Two()
 
   @override_str
-  @JSONField({'y--': 'y'})
+  @DeserializeConfig({'y--': JsonField(varname = 'y')})
   class Two(BaseJsonObject):
     def __init__(self):
       self.y: str = ''
       self.three: One2.Two.Three = One2.Two.Three()
 
     @override_str
-    @JSONField({'z--': 'z'})
+    @DeserializeConfig({'z--': JsonField(varname = 'z')})
     class Three(BaseJsonObject):
       def __init__(self):
         self.z: str = ''
