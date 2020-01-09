@@ -84,7 +84,7 @@ def JSONField(key_variable: dict):
 """
 
 
-def deserialize_object(d: dict) -> object:
+def deserialize_object(d: dict) -> object or dict:
   """
   用于json.loads()函数中的object_hook参数
   :param d: json转化过程中的字典

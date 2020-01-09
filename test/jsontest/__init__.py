@@ -59,6 +59,24 @@ class One2(BaseJsonObject):
         self.z: str = ''
 
 
+@override_str
+class One3(BaseJsonObject):
+  def __init__(self):
+    self.x: str = 'x'
+    self.two: List[One3.Two] = [One3.Two()]
+
+  @override_str
+  class Two(BaseJsonObject):
+    def __init__(self):
+      self.y: str = 'y'
+      self.three: List[One3.Two.Three] = [One3.Two.Three()]
+
+    @override_str
+    class Three(BaseJsonObject):
+      def __init__(self):
+        self.z: str = 'z'
+
+
 def json_test_1() -> bool:
   """
   json test
@@ -110,3 +128,44 @@ def json_test_4() -> bool:
   print(obj)
   f.close()
   return isinstance(obj, One2)
+
+
+def json_test_5() -> bool:
+  print('多级list测试')
+  f = open('./jsontest/eg5.json', 'r')
+  obj: One3 = selfusepy.parse_json(f.read(), One3())
+  print(obj)
+  f.close()
+  return isinstance(obj, One3)
+
+
+def json_test_6() -> bool:
+  print('线程安全测试')
+  f = open('./jsontest/eg1.json', 'r')
+  s1 = f.read()
+  f.close()
+  f = open('./jsontest/eg2.json', 'r')
+  s2 = f.read()
+  f.close()
+  f = open('./jsontest/eg3.json', 'r')
+  s3 = f.read()
+  f.close()
+  from multiprocessing import Pool
+  from multiprocessing.pool import ApplyResult
+  p = Pool(processes = 3)
+  res: List[ApplyResult] = list()
+  res.append(p.apply_async(func = selfusepy.parse_json, args = (s1, One(),)))
+  res.append(p.apply_async(func = selfusepy.parse_json, args = (s2, One1(),)))
+  res.append(p.apply_async(func = selfusepy.parse_json_array, args = (s3, One(),)))
+  p.close()
+  p.join()
+  for item in res:
+    value = item.get()
+    if isinstance(value, list):
+      print('list: ')
+      for l in value:
+        print(l)
+    else:
+      print(value)
+
+  return True
