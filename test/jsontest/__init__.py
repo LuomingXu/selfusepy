@@ -77,6 +77,13 @@ class One3(BaseJsonObject):
         self.z: str = 'z'
 
 
+@override_str
+class One4(BaseJsonObject):
+  def __init__(self):
+    self.x: str = ''
+    self.y: List[int] = [0]
+
+
 def json_test_1() -> bool:
   """
   json test
@@ -168,4 +175,14 @@ def json_test_6() -> bool:
     else:
       print(value)
 
+  return True
+
+
+def json_test_7() -> bool:
+  print("List[int]测试")
+  f = open('./jsontest/eg6.json', 'r')
+  s = f.read()
+  f.close()
+  obj: One4 = selfusepy.parse_json(s, One4())
+  print(obj)
   return True

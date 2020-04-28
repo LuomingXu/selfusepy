@@ -123,6 +123,10 @@ def add_classname(d: dict, classname: str) -> dict:
       add_classname(v, upper_first_letter(k))
     elif isinstance(v, list):
       for item in v:
+        # 如果这个list是基本类型(int, str...)之类则不需要添加classname
+        if isinstance(item, int) or isinstance(item, str) \
+          or isinstance(item, bool) or isinstance(item, complex):
+          break
         add_classname(item, upper_first_letter(k))
 
   return d
