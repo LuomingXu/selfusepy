@@ -184,5 +184,5 @@ def json_test_7() -> bool:
   s = f.read()
   f.close()
   obj: One4 = selfusepy.parse_json(s, One4())
-  print(obj)
-  return True
+
+  return isinstance(obj, One4)

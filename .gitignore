@@ -3,3 +3,4 @@ selfusepy.egg-info/
 dist/
 **/__pycache__/
 **/temp/
+build/
