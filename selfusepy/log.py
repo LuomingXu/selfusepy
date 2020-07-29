@@ -16,6 +16,11 @@
 #   File Name : log.py
 #   Repo: https://github.com/LuomingXu/selfusepy
 
+
+"""
+Python log 增强
+"""
+
 import logging
 from datetime import datetime, timedelta, timezone
 from enum import Enum
@@ -23,8 +28,6 @@ from logging import handlers
 from typing import List
 
 from selfusepy.utils import RootPath
-
-__all__ = ['LogTimeUTCOffset', 'Logger']
 
 
 def __UTC_12__(fmt, timestamp):

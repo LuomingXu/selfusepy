@@ -1,0 +1,16 @@
+{
+  "id": {
+    "$oid": "5f092c0af8724167b3912463"
+  },
+  "client": "d105b66e-e46d-40ce-94b1-1a2e44b875db",
+  "status": {
+    "capture_time": {
+      "$date": "2020-07-11T19:03:38Z"
+    },
+    "cpu_number": 6,
+    "memory_cap": 5918,
+    "load": 0.09,
+    "cpu_usage": 4,
+    "memory_usage": 52
+  }
+}

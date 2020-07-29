@@ -1,11 +1,11 @@
 from setuptools import setup, find_packages
 
-with open("README.md", "r") as fh:
-    long_description = fh.read()
+with open("README.md", "r") as f:
+    long_description = f.read()
 
 setup(
     name = 'selfusepy',
-    version = '0.0.14',
+    version = '0.0.15',
     license = 'Apache-2.0',
     author = 'Luoming Xu',
     author_email = 'xjy46566696@gmail.com',

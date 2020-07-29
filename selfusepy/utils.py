@@ -99,15 +99,6 @@ class ShowProcess(object):
         self.i = 0
 
 
-def upper_first_letter(s: str) -> str:
-    """
-    make first letter upper case
-    :param s:
-    :return:
-    """
-    return s[0].capitalize() + s[1:]
-
-
 class RootPath(object):
     """获取根目录"""
     root_path = None

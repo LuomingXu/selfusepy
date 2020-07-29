@@ -17,6 +17,7 @@ class TestCase(unittest.TestCase):
         self.assertEqual(jsontest.json_test_5(), True)
         self.assertEqual(jsontest.json_test_6(), True)
         self.assertEqual(jsontest.json_test_7(), True)
+        self.assertEqual(jsontest.json_test_8(), True)
 
 
 if __name__ == '__main__':

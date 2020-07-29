@@ -3,6 +3,7 @@ from typing import List
 import selfusepy
 from selfusepy.jsonparse import BaseJsonObject, DeserializeConfig, JsonField
 from selfusepy.utils import override_str
+from datetime import datetime
 
 
 @override_str
@@ -186,3 +187,47 @@ def json_test_7() -> bool:
   obj: One4 = selfusepy.parse_json(s, One4())
 
   return isinstance(obj, One4)
+
+
+def handle(x):
+  x = x[0:-1]  # 去除后缀的"Z"
+  return datetime.fromisoformat(x)
+
+
+@override_str
+class Obj(BaseJsonObject):
+
+  def __init__(self):
+    self.id: Obj.Id = Obj.Id()
+    self.client: str = ''
+    self.status: Obj.Status = Obj.Status()
+
+  @DeserializeConfig({"$oid": JsonField("oid")})
+  class Id(BaseJsonObject):
+
+    def __init__(self):
+      self.oid: str = ''
+
+  class Status(BaseJsonObject):
+
+    def __init__(self):
+      self.capture_time: Obj.Status.Capture_time = Obj.Status.Capture_time()
+      self.cpu_number: int = -1
+      self.memory_cap: int = -1
+      self.load: int = -1
+      self.cpu_usage = -1
+      self.memory_usage = -1
+
+    @DeserializeConfig({"$date": JsonField("date", func = handle)})
+    class Capture_time(BaseJsonObject):
+
+      def __init__(self):
+        self.date: datetime = datetime.now()
+
+
+def json_test_8() -> bool:
+  print("多级; 不同变量名; variable handler")
+  with open("./jsontest/eg7.json", "r") as f:
+    s = f.read()
+  obj: Obj = selfusepy.parse_json(s, Obj())
+  return isinstance(obj, Obj)

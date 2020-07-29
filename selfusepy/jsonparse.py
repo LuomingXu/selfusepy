@@ -17,15 +17,9 @@
 #   Repo: https://github.com/LuomingXu/selfusepy
 
 """
-用来Json to Object的工具库,
-可直接在__init__直接调用此工具库的实现
-来直接使用
+Json to Object的工具库
 """
 from typing import MutableMapping, TypeVar
-
-from selfusepy.utils import upper_first_letter
-
-__all__ = ['BaseJsonObject', 'DeserializeConfig', 'JsonField']
 
 T = TypeVar('T')
 class_dict = {}
@@ -42,9 +36,10 @@ class BaseJsonObject(object):
 
 class JsonField(object):
 
-    def __init__(self, varname: str = None, ignore: bool = False):
+    def __init__(self, varname, ignore: bool = False, func = None):
         self.varname: str = varname  # object's var's name
         self.ignore: bool = ignore  # do not convert this field
+        self.handle_func = func  # handle function for this variable
 
 
 def DeserializeConfig(_map: MutableMapping[str, JsonField]):
@@ -84,7 +79,7 @@ def JSONField(key_variable: dict):
 """
 
 
-def deserialize_object(d: dict) -> object or dict:
+def __deserialize_object__(d: dict) -> object or dict:
     """
     用于json.loads()函数中的object_hook参数
     :param d: json转化过程中的字典
@@ -102,15 +97,16 @@ def deserialize_object(d: dict) -> object or dict:
                     if res.ignore:
                         continue
                     if res.varname is not None:
-                        setattr(obj, res.varname, value)
-                        continue
+                        key = res.varname
+                    if res.handle_func is not None:
+                        value = res.handle_func(value)
             setattr(obj, key, value)
         return obj
     else:
         return d
 
 
-def add_classname(d: dict, classname: str) -> dict:
+def __add_classname__(d: dict, classname: str) -> dict:
     """
     给json字符串添加一个"__classname__"的key来作为转化的标志
     :param d: json的字典
@@ -120,25 +116,26 @@ def add_classname(d: dict, classname: str) -> dict:
     d[__classname__] = classname
     for k, v in d.items():
         if isinstance(v, dict):
-            add_classname(v, upper_first_letter(k))
+            __add_classname__(v, k.capitalize())
         elif isinstance(v, list):
             for item in v:
                 # 如果这个list是基本类型(int, str...)之类则不需要添加classname
-                if isinstance(item, int) or isinstance(item, str) \
-                    or isinstance(item, bool) or isinstance(item, complex):
+                if isinstance(item, int) or isinstance(item, str) or \
+                    isinstance(item, bool) or \
+                        isinstance(item, complex):
                     break
-                add_classname(item, upper_first_letter(k))
+                __add_classname__(item, k.capitalize())
 
     return d
 
 
-def add_classname_list(l: list, classname: str) -> list:
+def __add_classname_list__(l: list, classname: str) -> list:
     for d in l:
-        add_classname(d, classname)
+        __add_classname__(d, classname)
     return l
 
 
-def generate_class_dict(obj: BaseJsonObject):
+def __generate_class_dict__(obj: BaseJsonObject):
     """
     构造需要转化的目标类的所包含的所有类
     将key: 类名, value: class存入class_dict中
@@ -149,8 +146,8 @@ def generate_class_dict(obj: BaseJsonObject):
     for item in vars(obj).values():
         cls = type(item)
         if issubclass(cls, BaseJsonObject):
-            generate_class_dict(cls())
+            __generate_class_dict__(cls())
         elif issubclass(cls, list):
             cls = type(item.pop(0))
             if issubclass(cls, BaseJsonObject):
-                generate_class_dict(cls())
+                __generate_class_dict__(cls())

@@ -21,8 +21,12 @@ from datetime import datetime, timezone, timedelta
 from typing import TypeVar, List
 
 import selfusepy.jsonparse
+from jsonparse import BaseJsonObject, JsonField, DeserializeConfig
+from log import Logger, LogTimeUTCOffset
 
-__version__ = '0.0.14'
+__all__ = ["BaseJsonObject", "JsonField", "DeserializeConfig", "LogTimeUTCOffset", "Logger"]
+
+__version__ = '0.0.15'
 
 T = TypeVar('T')
 
@@ -45,10 +49,10 @@ def parse_json(j: str, obj: T) -> T:
     :return: obj
     """
 
-    jsonparse.generate_class_dict(obj)
+    jsonparse.__generate_class_dict__(obj)
     json_dict: dict = json.loads(j)
-    j_modified: str = json.dumps(jsonparse.add_classname(json_dict, type(obj).__name__))
-    res = json.loads(j_modified, object_hook = jsonparse.deserialize_object)
+    j_modified: str = json.dumps(jsonparse.__add_classname__(json_dict, type(obj).__name__))
+    res = json.loads(j_modified, object_hook = jsonparse.__deserialize_object__)
 
     jsonparse.class_dict.clear()
     return res
@@ -58,10 +62,10 @@ def parse_json_array(j: str, obj: T) -> List[T]:
     """
     Json array to List
     """
-    jsonparse.generate_class_dict(obj)
+    jsonparse.__generate_class_dict__(obj)
     json_list: list = json.loads(j)
-    j_modified: str = json.dumps(jsonparse.add_classname_list(json_list, type(obj).__name__))
-    res = json.loads(j_modified, object_hook = jsonparse.deserialize_object)
+    j_modified: str = json.dumps(jsonparse.__add_classname_list__(json_list, type(obj).__name__))
+    res = json.loads(j_modified, object_hook = jsonparse.__deserialize_object__)
 
     jsonparse.class_dict.clear()
     return res

@@ -1,7 +1,7 @@
 Self-Use Python Lib
 =
 
-[![image](https://img.shields.io/badge/pypi-v0.0.14-green.svg?logo=python)](https://pypi.org/project/selfusepy/)
+[![image](https://img.shields.io/badge/pypi-v0.0.15-green.svg?logo=python)](https://pypi.org/project/selfusepy/)
 [![image](https://img.shields.io/badge/License-Apache__v2-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 
 ### DirTree
@@ -14,13 +14,13 @@ Self-Use Python Lib
 more info in [json_test_cases]
 ```python
 import selfusepy
-obj: One = selfusepy.parse_json(jsoStr, One())
+obj: One = selfusepy.parse_json(jsonStr, One())
 ```
 
 #### Notice
     Because Python is not a strongly-typed language, so you must
     assign a value when you define a variable in class, 
-    otherwise the parse can not get the right type of each variable, 
+    otherwise the parser can not get the right type of each variable, 
     just like examples below 
 #### e.g. 1
 
@@ -30,8 +30,8 @@ from selfusepy.jsonparse import BaseJsonObject
 class One(BaseJsonObject):
 
   def __init__(self):
-    self.x: str = '' #  have to be assigned
-    self.two: One.Two = One.Two()
+    self.x: str = ''  # have to be assigned
+    self.two: One.Two = One.Two()  # have to be assigned
 
   class Two(BaseJsonObject):
     def __init__(self):
@@ -122,6 +122,18 @@ Json str
     }
   }
 }
+```
+
+#### e.g. 5
+```python
+def handle(x):
+  return datetime.fromisoformat(x)
+
+@DeserializeConfig({"date": JsonField("date", func = handle)})
+class Obj(BaseJsonObject):
+
+  def __init__(self):
+    self.date: datetime = datetime.now()
 ```
 
 [json_test_cases]:test/jsontest/__init__.py
