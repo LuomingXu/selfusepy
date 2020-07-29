@@ -1,3 +1,9 @@
+import sys
+
+sys.path.append('..')
+sys.path.append('../selfusepy')
+sys.path.append('../test')
+
 from typing import List
 
 import selfusepy
