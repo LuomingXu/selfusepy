@@ -21,8 +21,8 @@ from datetime import datetime, timezone, timedelta
 from typing import TypeVar, List
 
 import selfusepy.jsonparse
-from jsonparse import BaseJsonObject, JsonField, DeserializeConfig
-from log import Logger, LogTimeUTCOffset
+from .jsonparse import BaseJsonObject, JsonField, DeserializeConfig
+from .log import Logger, LogTimeUTCOffset
 
 __all__ = ["BaseJsonObject", "JsonField", "DeserializeConfig", "LogTimeUTCOffset", "Logger"]
 
