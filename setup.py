@@ -5,7 +5,7 @@ with open("README.md", "r") as f:
 
 setup(
     name = 'selfusepy',
-    version = '0.0.15',
+    version = '0.0.16',
     license = 'Apache-2.0',
     author = 'Luoming Xu',
     author_email = 'xjy46566696@gmail.com',
