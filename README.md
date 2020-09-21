@@ -1,7 +1,7 @@
 Self-Use Python Lib
 =
 
-[![image](https://img.shields.io/badge/pypi-v0.0.16-green.svg?logo=python)](https://pypi.org/project/selfusepy/)
+[![image](https://img.shields.io/badge/pypi-v0.0.17-green.svg?logo=python)](https://pypi.org/project/selfusepy/)
 [![image](https://img.shields.io/badge/License-Apache__v2-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 
 ### DirTree
@@ -30,8 +30,8 @@ from selfusepy.jsonparse import BaseJsonObject
 class One(BaseJsonObject):
 
   def __init__(self):
-    self.x: str = ''  # have to be assigned
-    self.two: One.Two = One.Two()  # have to be assigned
+    self.x: str = ''  # have to be init
+    self.two: One.Two = One.Two()  # have to be init
 
   class Two(BaseJsonObject):
     def __init__(self):
@@ -129,7 +129,7 @@ Json str
 def handle(x):
   return datetime.fromisoformat(x)
 
-@DeserializeConfig({"date": JsonField("date", func = handle)})
+@DeserializeConfig({"date": JsonField(func = handle)})
 class Obj(BaseJsonObject):
 
   def __init__(self):
