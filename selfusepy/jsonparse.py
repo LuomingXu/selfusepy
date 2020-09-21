@@ -19,9 +19,8 @@
 """
 Json to Object的工具库
 """
-from typing import MutableMapping, TypeVar
+from typing import MutableMapping
 
-T = TypeVar('T')
 class_dict = {}
 __classname__: str = '__classname__'
 
@@ -36,7 +35,7 @@ class BaseJsonObject(object):
 
 class JsonField(object):
 
-    def __init__(self, varname, ignore: bool = False, func = None):
+    def __init__(self, varname = None, ignore: bool = False, func = None):
         self.varname: str = varname  # object's var's name
         self.ignore: bool = ignore  # do not convert this field
         self.handle_func = func  # handle function for this variable
@@ -96,9 +95,9 @@ def __deserialize_object__(d: dict) -> object or dict:
                 if res:  # 判断这个key是否配置了注解
                     if res.ignore:
                         continue
-                    if res.varname is not None:
+                    if res.varname:
                         key = res.varname
-                    if res.handle_func is not None:
+                    if res.handle_func:
                         value = res.handle_func(value)
             setattr(obj, key, value)
         return obj

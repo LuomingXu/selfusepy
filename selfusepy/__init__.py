@@ -20,13 +20,12 @@ import json
 from datetime import datetime, timezone, timedelta
 from typing import TypeVar, List
 
-import selfusepy.jsonparse
 from .jsonparse import BaseJsonObject, JsonField, DeserializeConfig
 from .log import Logger, LogTimeUTCOffset
 
 __all__ = ["BaseJsonObject", "JsonField", "DeserializeConfig", "LogTimeUTCOffset", "Logger"]
 
-__version__ = '0.0.16'
+__version__ = '0.0.17'
 
 T = TypeVar('T')
 
@@ -39,12 +38,12 @@ def now(offset: int):
     return datetime.now(timezone(timedelta(hours = offset)))
 
 
-def parse_json(j: str, obj: T) -> T:
+def parse_json(j: str or bytes or bytearray, obj: T) -> T:
     """
     Json to Python Object
     >>>import selfusepy
     >>>obj: T = selfusepy.parse_json(jsonStr, Obj())
-    :param j: json string
+    :param j: json format obj
     :param obj: Py Object
     :return: obj
     """

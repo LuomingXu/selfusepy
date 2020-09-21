@@ -176,7 +176,7 @@ class Logger(object):
 
     def __init__(self, filename = None, time_offset: LogTimeUTCOffset = LogTimeUTCOffset.UTC8, when = 'D',
                  backCount = 3,
-                 fmt = '%(asctime)s-[%(levelname)8s]-[%(threadName)15s] %(customPathname)50s(%(lineno)d): %(message)s'):
+                 fmt = '%(asctime)s-[%(levelname)s]-[%(process)d/%(thread)d]-[%(threadName)s] %(customPathname)50s(%(lineno)d): %(message)s'):
         """
         init
         :param filename: 储存日志的文件, 为None的话就是不储存日志到文件

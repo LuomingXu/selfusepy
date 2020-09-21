@@ -5,7 +5,7 @@ with open("README.md", "r") as f:
 
 setup(
     name = 'selfusepy',
-    version = '0.0.16',
+    version = '0.0.17',
     license = 'Apache-2.0',
     author = 'Luoming Xu',
     author_email = 'xjy46566696@gmail.com',
@@ -18,6 +18,7 @@ setup(
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Customer Service',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'License :: OSI Approved :: Apache Software License',
         'Natural Language :: Chinese (Simplified)',
         'Operating System :: OS Independent',
