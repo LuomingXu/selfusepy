@@ -3,8 +3,12 @@ from selfusepy.log import LogTimeUTCOffset
 
 
 def log_test():
-  log = Logger().logger
-  log.info('first')
+    log = Logger().logger
+    log.debug("debug")
+    log.info('info')
+    log.warning("warning")
+    log.error("error")
+    log.critical("critical")
 
 
 def log_time_test():

@@ -22,6 +22,7 @@ Python log 增强
 """
 
 import logging
+import sys
 from datetime import datetime, timedelta, timezone
 from enum import Enum
 from logging import handlers
@@ -31,107 +32,107 @@ from selfusepy.utils import RootPath
 
 
 def __UTC_12__(fmt, timestamp):
-    return __delta_base__(-12)
+    return __delta_base__(-12, timestamp)
 
 
 def __UTC_11__(fmt, timestamp):
-    return __delta_base__(-11)
+    return __delta_base__(-11, timestamp)
 
 
 def __UTC_10__(fmt, timestamp):
-    return __delta_base__(-10)
+    return __delta_base__(-10, timestamp)
 
 
 def __UTC_9__(fmt, timestamp):
-    return __delta_base__(-9)
+    return __delta_base__(-9, timestamp)
 
 
 def __UTC_8__(fmt, timestamp):
-    return __delta_base__(-8)
+    return __delta_base__(-8, timestamp)
 
 
 def __UTC_7__(fmt, timestamp):
-    return __delta_base__(-7)
+    return __delta_base__(-7, timestamp)
 
 
 def __UTC_6__(fmt, timestamp):
-    return __delta_base__(-6)
+    return __delta_base__(-6, timestamp)
 
 
 def __UTC_5__(fmt, timestamp):
-    return __delta_base__(-5)
+    return __delta_base__(-5, timestamp)
 
 
 def __UTC_4__(fmt, timestamp):
-    return __delta_base__(-4)
+    return __delta_base__(-4, timestamp)
 
 
 def __UTC_3__(fmt, timestamp):
-    return __delta_base__(-3)
+    return __delta_base__(-3, timestamp)
 
 
 def __UTC_2__(fmt, timestamp):
-    return __delta_base__(-2)
+    return __delta_base__(-2, timestamp)
 
 
 def __UTC_1__(fmt, timestamp):
-    return __delta_base__(-1)
+    return __delta_base__(-1, timestamp)
 
 
 def __UTC__(fmt, timestamp):
-    return __delta_base__(0)
+    return __delta_base__(0, timestamp)
 
 
 def __UTC1__(fmt, timestamp):
-    return __delta_base__(1)
+    return __delta_base__(1, timestamp)
 
 
 def __UTC2__(fmt, timestamp):
-    return __delta_base__(2)
+    return __delta_base__(2, timestamp)
 
 
 def __UTC3__(fmt, timestamp):
-    return __delta_base__(3)
+    return __delta_base__(3, timestamp)
 
 
 def __UTC4__(fmt, timestamp):
-    return __delta_base__(4)
+    return __delta_base__(4, timestamp)
 
 
 def __UTC5__(fmt, timestamp):
-    return __delta_base__(5)
+    return __delta_base__(5, timestamp)
 
 
 def __UTC6__(fmt, timestamp):
-    return __delta_base__(6)
+    return __delta_base__(6, timestamp)
 
 
 def __UTC7__(fmt, timestamp):
-    return __delta_base__(7)
+    return __delta_base__(7, timestamp)
 
 
 def __UTC8__(fmt, timestamp):
-    return __delta_base__(8)
+    return __delta_base__(8, timestamp)
 
 
 def __UTC9__(fmt, timestamp):
-    return __delta_base__(9)
+    return __delta_base__(9, timestamp)
 
 
 def __UTC10__(fmt, timestamp):
-    return __delta_base__(10)
+    return __delta_base__(10, timestamp)
 
 
 def __UTC11__(fmt, timestamp):
-    return __delta_base__(11)
+    return __delta_base__(11, timestamp)
 
 
 def __UTC12__(fmt, timestamp):
-    return __delta_base__(12)
+    return __delta_base__(12, timestamp)
 
 
-def __delta_base__(delta: int):
-    return datetime.now(timezone(timedelta(hours = delta))).timetuple()
+def __delta_base__(delta: int, timestamp):
+    return datetime.fromtimestamp(timestamp, timezone(timedelta(hours = delta))).timetuple()
 
 
 class LogTimeUTCOffset(Enum):
@@ -167,6 +168,9 @@ class LogTimeUTCOffset(Enum):
     UTC12 = __UTC12__
 
 
+levels: list = [logging.NOTSET, logging.DEBUG, logging.INFO, logging.WARN, logging.ERROR, logging.FATAL]
+
+
 class Logger(object):
     """
     日志类
@@ -174,32 +178,59 @@ class Logger(object):
            log.info('info')
     """
 
-    def __init__(self, filename = None, time_offset: LogTimeUTCOffset = LogTimeUTCOffset.UTC8, when = 'D',
-                 backCount = 3,
-                 fmt = '%(asctime)s-[%(levelname)s]-[%(process)d/%(thread)d]-[%(threadName)s] %(customPathname)50s(%(lineno)d): %(message)s'):
+    def __init__(self, filename = None, time_offset: LogTimeUTCOffset = LogTimeUTCOffset.UTC8,
+                 levelToStderr = logging.WARNING,
+                 fmt = '%(asctime)s-[%(levelname)s]-[%(process)d/%(thread)d]-[%(threadName)s] %(customPathname)50s(%(lineno)d): %(message)s',
+                 **kwargs):
         """
         init
         :param filename: 储存日志的文件, 为None的话就是不储存日志到文件
-        :param when: 间隔的时间单位. S秒, M分, H小时, D天, W每星期(interval==0时代表星期一) midnight 每天凌晨
-        :param backCount: 备份文件的个数, 如果超过这个个数, 就会自动删除
         :param time_offset: log的时间, 默认为UTC+8
+        :param levelToStderr: 写入到stderr的log级别, 默认为warning
         :param fmt: 日志格式
+        :param kwargs: 对应TimedRotatingFileHandler的参数
+        when: 间隔的时间单位. S秒, M分, H小时, D天, W每星期(interval==0时代表星期一) midnight 每天凌晨
+        backupCount: 备份文件的个数, 如果超过这个个数, 就会自动删除
         """
         logging.Formatter.converter = time_offset
         self.logger = logging.Logger(filename)
         format_str = logging.Formatter(fmt)
-        self.logger.setLevel(logging.DEBUG)  # 设置日志级别为debug, 所有的log都可以打印出来
-        sh = logging.StreamHandler()  # 控制台输出
-        sh.setFormatter(format_str)
-        self.logger.addHandler(sh)
+        self.logger.setLevel(logging.NOTSET)  # 设置日志级别为notset, 所有的log都可以打印出来
+        for level in levels:  # 在warn级别之上使用stderr
+            if level >= levelToStderr:
+                sh = logging.StreamHandler(stream = sys.stderr)
+            else:
+                sh = logging.StreamHandler(stream = sys.stdout)
+            sh.setFormatter(format_str)
+            sh.addFilter(StreamHandlerFilter(level))
+            self.logger.addHandler(sh)
         self.logger.addFilter(LoggerFilter())
 
         if filename is not None:
             """实例化TimedRotatingFileHandler"""
-            th = handlers.TimedRotatingFileHandler(filename = filename, when = when, backupCount = backCount,
-                                                   encoding = 'utf-8')
+            if 'encoding' in kwargs.keys():
+                th = handlers.TimedRotatingFileHandler(filename = filename, **kwargs)
+            else:
+                th = handlers.TimedRotatingFileHandler(filename = filename, encoding = 'utf-8', **kwargs)
             th.setFormatter(format_str)  # 设置文件里写入的格式
             self.logger.addHandler(th)
+
+
+class StreamHandlerFilter(logging.Filter):
+
+    def __init__(self, level):
+        self.level = level
+        super().__init__()
+
+    def filter(self, record: logging.LogRecord) -> int:
+        """
+        若是此StreamHandler的leve与Record的级别不一致, 则不显示
+        :param record:
+        :return:
+        """
+        if self.level == record.levelno:
+            return True
+        return False
 
 
 class LoggerFilter(logging.Filter):
