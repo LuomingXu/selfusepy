@@ -1,11 +1,14 @@
 from setuptools import setup, find_packages
 
+version = '0.0.18'
+
+# set README as long description
 with open("README.md", "r") as f:
     long_description = f.read()
 
 setup(
     name = 'selfusepy',
-    version = '0.0.17',
+    version = version,
     license = 'Apache-2.0',
     author = 'Luoming Xu',
     author_email = 'xjy46566696@gmail.com',
@@ -19,6 +22,7 @@ setup(
         'Intended Audience :: Customer Service',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
         'License :: OSI Approved :: Apache Software License',
         'Natural Language :: Chinese (Simplified)',
         'Operating System :: OS Independent',

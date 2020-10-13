@@ -4,3 +4,4 @@ dist/
 **/__pycache__/
 **/temp/
 build/
+update_version.py
