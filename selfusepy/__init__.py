@@ -25,7 +25,7 @@ from .log import Logger
 
 __all__ = ["BaseJsonObject", "JsonField", "DeserializeConfig", "Logger"]
 
-__version__ = '0.0.18'
+__version__ = '0.1.0'
 
 T = TypeVar('T')
 
