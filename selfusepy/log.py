@@ -23,149 +23,16 @@ Python log 增强
 
 import logging
 import sys
+import time
 from datetime import datetime, timedelta, timezone
-from enum import Enum
-from logging import handlers
-from typing import List
+from logging import handlers, LogRecord
+from typing import List, Optional
 
 from selfusepy.utils import RootPath
 
 
-def __UTC_12__(fmt, timestamp):
-    return __delta_base__(-12, timestamp)
-
-
-def __UTC_11__(fmt, timestamp):
-    return __delta_base__(-11, timestamp)
-
-
-def __UTC_10__(fmt, timestamp):
-    return __delta_base__(-10, timestamp)
-
-
-def __UTC_9__(fmt, timestamp):
-    return __delta_base__(-9, timestamp)
-
-
-def __UTC_8__(fmt, timestamp):
-    return __delta_base__(-8, timestamp)
-
-
-def __UTC_7__(fmt, timestamp):
-    return __delta_base__(-7, timestamp)
-
-
-def __UTC_6__(fmt, timestamp):
-    return __delta_base__(-6, timestamp)
-
-
-def __UTC_5__(fmt, timestamp):
-    return __delta_base__(-5, timestamp)
-
-
-def __UTC_4__(fmt, timestamp):
-    return __delta_base__(-4, timestamp)
-
-
-def __UTC_3__(fmt, timestamp):
-    return __delta_base__(-3, timestamp)
-
-
-def __UTC_2__(fmt, timestamp):
-    return __delta_base__(-2, timestamp)
-
-
-def __UTC_1__(fmt, timestamp):
-    return __delta_base__(-1, timestamp)
-
-
-def __UTC__(fmt, timestamp):
-    return __delta_base__(0, timestamp)
-
-
-def __UTC1__(fmt, timestamp):
-    return __delta_base__(1, timestamp)
-
-
-def __UTC2__(fmt, timestamp):
-    return __delta_base__(2, timestamp)
-
-
-def __UTC3__(fmt, timestamp):
-    return __delta_base__(3, timestamp)
-
-
-def __UTC4__(fmt, timestamp):
-    return __delta_base__(4, timestamp)
-
-
-def __UTC5__(fmt, timestamp):
-    return __delta_base__(5, timestamp)
-
-
-def __UTC6__(fmt, timestamp):
-    return __delta_base__(6, timestamp)
-
-
-def __UTC7__(fmt, timestamp):
-    return __delta_base__(7, timestamp)
-
-
-def __UTC8__(fmt, timestamp):
-    return __delta_base__(8, timestamp)
-
-
-def __UTC9__(fmt, timestamp):
-    return __delta_base__(9, timestamp)
-
-
-def __UTC10__(fmt, timestamp):
-    return __delta_base__(10, timestamp)
-
-
-def __UTC11__(fmt, timestamp):
-    return __delta_base__(11, timestamp)
-
-
-def __UTC12__(fmt, timestamp):
-    return __delta_base__(12, timestamp)
-
-
-def __delta_base__(delta: int, timestamp):
+def __delta_base__(fmt, delta: int, timestamp):
     return datetime.fromtimestamp(timestamp, timezone(timedelta(hours = delta))).timetuple()
-
-
-class LogTimeUTCOffset(Enum):
-    """
-    UTC_8 -> UTC-08:00
-    UTC8  -> UTC+08:00
-    """
-
-    UTC_12 = __UTC_12__
-    UTC_11 = __UTC_11__
-    UTC_10 = __UTC_10__
-    UTC_9 = __UTC_9__
-    UTC_8 = __UTC_8__
-    UTC_7 = __UTC_7__
-    UTC_6 = __UTC_6__
-    UTC_5 = __UTC_5__
-    UTC_4 = __UTC_4__
-    UTC_3 = __UTC_3__
-    UTC_2 = __UTC_2__
-    UTC_1 = __UTC_1__
-    UTC = __UTC__
-    UTC1 = __UTC1__
-    UTC2 = __UTC2__
-    UTC3 = __UTC3__
-    UTC4 = __UTC4__
-    UTC5 = __UTC5__
-    UTC6 = __UTC6__
-    UTC7 = __UTC7__
-    UTC8 = __UTC8__
-    UTC9 = __UTC9__
-    UTC10 = __UTC10__
-    UTC11 = __UTC11__
-    UTC12 = __UTC12__
 
 
 levels: list = [logging.NOTSET, logging.DEBUG, logging.INFO, logging.WARN, logging.ERROR, logging.FATAL]
@@ -178,30 +45,32 @@ class Logger(object):
            log.info('info')
     """
 
-    def __init__(self, filename = None, time_offset: LogTimeUTCOffset = LogTimeUTCOffset.UTC8,
+    def __init__(self, filename = None, time_offset: int = None,
                  levelToStderr = logging.WARNING,
                  fmt = '%(asctime)s-[%(levelname)s]-[%(process)d/%(thread)d]-[%(threadName)s] %(customPathname)50s(%(lineno)d): %(message)s',
                  **kwargs):
         """
         init
         :param filename: 储存日志的文件, 为None的话就是不储存日志到文件
-        :param time_offset: log的时间, 默认为UTC+8
+        :param time_offset: log的时区, 默认为8(UTC+08:00)
         :param levelToStderr: 写入到stderr的log级别, 默认为warning
         :param fmt: 日志格式
         :param kwargs: 对应TimedRotatingFileHandler的参数
         when: 间隔的时间单位. S秒, M分, H小时, D天, W每星期(interval==0时代表星期一) midnight 每天凌晨
         backupCount: 备份文件的个数, 如果超过这个个数, 就会自动删除
         """
-        logging.Formatter.converter = time_offset
+        # logging.Formatter.converter = time_offset
         self.logger = logging.Logger(filename)
-        format_str = logging.Formatter(fmt)
+        CustomFormatter.time_offset = time_offset if time_offset else 8
+        formatter = CustomFormatter(fmt)
         self.logger.setLevel(logging.NOTSET)  # 设置日志级别为notset, 所有的log都可以打印出来
         for level in levels:  # 在warn级别之上使用stderr
             if level >= levelToStderr:
                 sh = logging.StreamHandler(stream = sys.stderr)
             else:
                 sh = logging.StreamHandler(stream = sys.stdout)
-            sh.setFormatter(format_str)
+            sh.setLevel(level)
+            sh.setFormatter(formatter)
             sh.addFilter(StreamHandlerFilter(level))
             self.logger.addHandler(sh)
         self.logger.addFilter(LoggerFilter())
@@ -212,8 +81,22 @@ class Logger(object):
                 th = handlers.TimedRotatingFileHandler(filename = filename, **kwargs)
             else:
                 th = handlers.TimedRotatingFileHandler(filename = filename, encoding = 'utf-8', **kwargs)
-            th.setFormatter(format_str)  # 设置文件里写入的格式
+            th.setFormatter(formatter)  # 设置文件里写入的格式
             self.logger.addHandler(th)
+
+
+class CustomFormatter(logging.Formatter):
+    time_offset = None
+
+    def formatTime(self, record: LogRecord, datefmt: Optional[str] = ...) -> str:
+        ct = __delta_base__(self, self.time_offset, record.created)
+        if datefmt:
+            s = time.strftime(datefmt, ct)
+        else:
+            t = time.strftime(self.default_time_format, ct)
+            s = self.default_msec_format % (t, record.msecs)
+
+        return s
 
 
 class StreamHandlerFilter(logging.Filter):
@@ -264,7 +147,7 @@ class LoggerFilter(logging.Filter):
         record.customPathname = '.'.join('%s' % item for item in l)
         """
         不能在这边直接就修改
-        >>>record.pathname = '.'.join('%s' % item for item in l)
+        >>> record.pathname = '.'.join('%s' % item for item in l)
         有可能后面的log依赖这个pathname, 那么这个pathname就被修改了, 
         而没有被系统重新赋予正确的pathname
         例如test.log包中的多层级__init__, 就会出现这种问题

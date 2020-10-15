@@ -21,9 +21,9 @@ from datetime import datetime, timezone, timedelta
 from typing import TypeVar, List
 
 from .jsonparse import BaseJsonObject, JsonField, DeserializeConfig
-from .log import Logger, LogTimeUTCOffset
+from .log import Logger
 
-__all__ = ["BaseJsonObject", "JsonField", "DeserializeConfig", "LogTimeUTCOffset", "Logger"]
+__all__ = ["BaseJsonObject", "JsonField", "DeserializeConfig", "Logger"]
 
 __version__ = '0.0.18'
 
