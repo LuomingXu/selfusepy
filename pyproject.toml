@@ -23,4 +23,12 @@ dependencies = [
 
 ]
 
+[project.urls]
+Homepage = "https://github.com/LuomingXu/selfusepy"
+Documentation = "https://github.com/LuomingXu/selfusepy"
+Repository = "https://github.com/LuomingXu/selfusepy"
+Issues = "https://github.com/LuomingXu/selfusepy/issues"
 
+[tool.setuptools.packages.find]
+where = ["selfusepy", "*.md", "LICENSE"]
+exclude = ["test*", ".gitignore"]
