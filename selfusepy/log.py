@@ -32,7 +32,7 @@ from selfusepy.utils import RootPath
 
 
 def __delta_base__(fmt, delta: int, timestamp):
-    return datetime.fromtimestamp(timestamp, timezone(timedelta(hours = delta))).timetuple()
+    return datetime.fromtimestamp(timestamp, timezone(timedelta(hours=delta))).timetuple()
 
 
 levels: list = [logging.NOTSET, logging.DEBUG, logging.INFO, logging.WARN, logging.ERROR, logging.FATAL]
@@ -45,9 +45,9 @@ class Logger(object):
            log.info('info')
     """
 
-    def __init__(self, filename = None, time_offset: int = None,
-                 levelToStderr = logging.WARNING,
-                 fmt = '%(asctime)s-[%(levelname)s]-[%(process)d/%(thread)d]-[%(threadName)s] %(customPathname)50s(%(lineno)d): %(message)s',
+    def __init__(self, filename=None, time_offset: int = None,
+                 levelToStderr=logging.WARNING,
+                 fmt='%(asctime)s-[%(levelname)s]-[%(process)d/%(thread)d]-[%(threadName)s] %(customPathname)50s(%(lineno)d): %(message)s',
                  **kwargs):
         """
         init
@@ -66,9 +66,9 @@ class Logger(object):
         self.logger.setLevel(logging.NOTSET)  # 设置日志级别为notset, 所有的log都可以打印出来
         for level in levels:  # 在warn级别之上使用stderr
             if level >= levelToStderr:
-                sh = logging.StreamHandler(stream = sys.stderr)
+                sh = logging.StreamHandler(stream=sys.stderr)
             else:
-                sh = logging.StreamHandler(stream = sys.stdout)
+                sh = logging.StreamHandler(stream=sys.stdout)
             sh.setLevel(level)
             sh.setFormatter(formatter)
             sh.addFilter(StreamHandlerFilter(level))
@@ -78,9 +78,9 @@ class Logger(object):
         if filename is not None:
             """实例化TimedRotatingFileHandler"""
             if 'encoding' in kwargs.keys():
-                th = handlers.TimedRotatingFileHandler(filename = filename, **kwargs)
+                th = handlers.TimedRotatingFileHandler(filename=filename, **kwargs)
             else:
-                th = handlers.TimedRotatingFileHandler(filename = filename, encoding = 'utf-8', **kwargs)
+                th = handlers.TimedRotatingFileHandler(filename=filename, encoding='utf-8', **kwargs)
             th.setFormatter(formatter)  # 设置文件里写入的格式
             self.logger.addHandler(th)
 

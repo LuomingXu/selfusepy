@@ -19,7 +19,7 @@
 """
 Json to Object的工具库
 """
-from typing import MutableMapping
+from typing import MutableMapping, Any, Type, get_type_hints, get_origin, get_args
 
 class_dict = {}
 __classname__: str = '__classname__'
@@ -35,7 +35,7 @@ class BaseJsonObject(object):
 
 class JsonField(object):
 
-    def __init__(self, varname = None, ignore: bool = False, func = None):
+    def __init__(self, varname=None, ignore: bool = False, func=None):
         self.varname: str = varname  # object's var's name
         self.ignore: bool = ignore  # do not convert this field
         self.handle_func = func  # handle function for this variable
@@ -48,7 +48,7 @@ def DeserializeConfig(_map: MutableMapping[str, JsonField]):
     """
 
     def func(clazz):
-        def get_annotation(self, k: str = None) -> JsonField or MutableMapping[str, JsonField]:
+        def get_annotation(self, k: str = None) -> JsonField | MutableMapping[str, JsonField]:
             return _map.get(k) if k else _map
 
         clazz.get_annotation = get_annotation
@@ -78,7 +78,7 @@ def JSONField(key_variable: dict):
 """
 
 
-def __deserialize_object__(d: dict) -> object or dict:
+def _deserialize_object(d: dict) -> object | dict:
     """
     用于json.loads()函数中的object_hook参数
     :param d: json转化过程中的字典
@@ -105,36 +105,59 @@ def __deserialize_object__(d: dict) -> object or dict:
         return d
 
 
-def __add_classname__(d: dict, classname: str) -> dict:
+def _add_classname(d: dict, t: Type) -> dict:
     """
     给json字符串添加一个"__classname__"的key来作为转化的标志
     :param d: json的字典
     :param classname: 转化的目标类
     :return: 修改完后的json dict
     """
-    d[__classname__] = classname
+    if get_origin(t) is list:
+        t = get_args(t)[0]
+    type_hints = get_type_hints(t)
+    d[__classname__] = t.__name__
+
     for k, v in d.items():
         if isinstance(v, dict):
-            __add_classname__(v, k.capitalize())
+            _add_classname(v, type_hints.get(k))
         elif isinstance(v, list):
             for item in v:
                 # 如果这个list是基本类型(int, str...)之类则不需要添加classname
                 if isinstance(item, int) or isinstance(item, str) or \
-                    isinstance(item, bool) or \
+                        isinstance(item, bool) or isinstance(item, float) or \
                         isinstance(item, complex):
                     break
-                __add_classname__(item, k.capitalize())
+                _add_classname(item, type_hints.get(k))
 
     return d
 
 
-def __add_classname_list__(l: list, classname: str) -> list:
+def _add_classname_list(l: list, classname: Type) -> list:
     for d in l:
-        __add_classname__(d, classname)
+        _add_classname(d, classname)
     return l
 
 
-def __generate_class_dict__(obj: BaseJsonObject):
+def _safe_issubclass(tp: Any, cls: Type):
+    """
+    安全判断 tp 是否是 cls 的子类。
+    防止出现判断{_GenericAlias}typing.List[str]报错
+
+    参数：
+        tp: 待判断对象，可能是 class，也可能是 typing 泛型等任意类型
+        cls: 目标类
+
+    返回：
+        bool: 如果 tp 是 cls 的子类返回 True，否则返回 False。
+              如果 tp 不是 class 类型，返回 False，不会抛异常。
+    """
+    try:
+        return issubclass(tp, cls)
+    except TypeError:
+        return False
+
+
+def _generate_class_dict(obj: BaseJsonObject):
     """
     构造需要转化的目标类的所包含的所有类
     将key: 类名, value: class存入class_dict中
@@ -142,11 +165,11 @@ def __generate_class_dict__(obj: BaseJsonObject):
     """
     cls = type(obj)
     class_dict[cls.__name__] = cls
-    for item in vars(obj).values():
-        cls = type(item)
-        if issubclass(cls, BaseJsonObject):
-            __generate_class_dict__(cls())
-        elif issubclass(cls, list):
-            cls = type(item.pop(0))
-            if issubclass(cls, BaseJsonObject):
-                __generate_class_dict__(cls())
+    type_hints = get_type_hints(cls)
+    for k, cls in type_hints.items():
+        if _safe_issubclass(cls, BaseJsonObject):
+            _generate_class_dict(cls())
+        elif get_origin(cls) is list:
+            cls = get_args(cls)[0]
+            if _safe_issubclass(cls, BaseJsonObject):
+                _generate_class_dict(cls())

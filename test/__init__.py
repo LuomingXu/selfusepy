@@ -10,6 +10,7 @@ import logtest.package.package.package.package.package.longlonglonglonglonglongl
 
 class TestCase(unittest.TestCase):
     def test_jsonparse(self):
+        self.assertEqual(jsontest.json_test_0(), True)
         self.assertEqual(jsontest.json_test_1(), True)
         self.assertEqual(jsontest.json_test_2(), True)
         self.assertEqual(jsontest.json_test_3(), (True, True))

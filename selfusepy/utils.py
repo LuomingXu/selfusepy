@@ -22,14 +22,12 @@ import os
 import sys
 from typing import MutableMapping
 
-__all__ = ["eprint", "override_str", "ShowProcess", "lookahead"]
 
-
-def eprint(*args, sep = ' ', end = '\n', file = sys.stderr):
+def eprint(*args, sep=' ', end='\n', file=sys.stderr):
     """
     collect from: https://stackoverflow.com/questions/5574702/how-to-print-to-stderr-in-python
     """
-    print(*args, sep = sep, end = end, file = file)
+    print(*args, sep=sep, end=end, file=file)
 
 
 def override_str(clazz):
@@ -66,7 +64,7 @@ class ShowProcess(object):
     max_arrow = 50  # 进度条的长度
     infoDone = 'done'
 
-    def __init__(self, max_steps, infoDone = 'Done'):
+    def __init__(self, max_steps, infoDone='Done'):
         """
         初始化函数，需要知道总共的处理次数
         :param max_steps: 总共需要处理的次数
@@ -76,7 +74,7 @@ class ShowProcess(object):
         self.i = 0
         self.infoDone = infoDone
 
-    def show_process(self, i = None):
+    def show_process(self, i=None):
         """
         显示函数，根据当前的处理进度i显示进度
         :param i: 当前进度

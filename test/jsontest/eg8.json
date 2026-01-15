@@ -1,0 +1,16 @@
+{
+  "EventType": "StreamEnded",
+  "EventTimestamp": "2026-01-15T04:45:56.4860412+08:00",
+  "EventId": "6f8d6c7f-5072-484d-921b-1c5aa386fde9",
+  "EventData": {
+    "RoomId": 1234,
+    "ShortId": 0,
+    "Name": "双",
+    "Title": "双",
+    "AreaNameParent": "知",
+    "AreaNameChild": "社",
+    "Recording": true,
+    "Streaming": false,
+    "DanmakuConnected": true
+  }
+}

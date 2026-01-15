@@ -22,23 +22,25 @@ from typing import TypeVar, List
 
 from .jsonparse import BaseJsonObject, JsonField, DeserializeConfig
 from .log import Logger
+from .utils import eprint, override_str, ShowProcess, lookahead
 
-__all__ = ["BaseJsonObject", "JsonField", "DeserializeConfig", "Logger"]
+__all__ = ["BaseJsonObject", "JsonField", "DeserializeConfig", "Logger", "eprint", "override_str", "ShowProcess",
+           "lookahead"]
 
-__version__ = '0.1.0'
+__version__ = '0.2.0'
 
 T = TypeVar('T')
 
 
 def fromtimestamp(timestamp: float, offset: int) -> datetime:
-    return datetime.fromtimestamp(timestamp, timezone(timedelta(hours = offset)))
+    return datetime.fromtimestamp(timestamp, timezone(timedelta(hours=offset)))
 
 
 def now(offset: int):
-    return datetime.now(timezone(timedelta(hours = offset)))
+    return datetime.now(timezone(timedelta(hours=offset)))
 
 
-def parse_json(j: str or bytes or bytearray, obj: T) -> T:
+def parse_json(j: str | bytes | bytearray, obj: T) -> T:
     """
     Json to Python Object
     >>>import selfusepy
@@ -48,10 +50,10 @@ def parse_json(j: str or bytes or bytearray, obj: T) -> T:
     :return: obj
     """
 
-    jsonparse.__generate_class_dict__(obj)
+    jsonparse._generate_class_dict(obj)
     json_dict: dict = json.loads(j)
-    j_modified: str = json.dumps(jsonparse.__add_classname__(json_dict, type(obj).__name__))
-    res = json.loads(j_modified, object_hook = jsonparse.__deserialize_object__)
+    j_modified: str = json.dumps(jsonparse._add_classname(json_dict, type(obj)))
+    res = json.loads(j_modified, object_hook=jsonparse._deserialize_object)
 
     jsonparse.class_dict.clear()
     return res
@@ -61,10 +63,10 @@ def parse_json_array(j: str, obj: T) -> List[T]:
     """
     Json array to List
     """
-    jsonparse.__generate_class_dict__(obj)
+    jsonparse._generate_class_dict(obj)
     json_list: list = json.loads(j)
-    j_modified: str = json.dumps(jsonparse.__add_classname_list__(json_list, type(obj).__name__))
-    res = json.loads(j_modified, object_hook = jsonparse.__deserialize_object__)
+    j_modified: str = json.dumps(jsonparse._add_classname_list(json_list, type(obj)))
+    res = json.loads(j_modified, object_hook=jsonparse._deserialize_object)
 
     jsonparse.class_dict.clear()
     return res
