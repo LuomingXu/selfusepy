@@ -27,7 +27,7 @@ from .utils import eprint, override_str, ShowProcess, lookahead
 __all__ = ["BaseJsonObject", "JsonField", "DeserializeConfig", "Logger", "eprint", "override_str", "ShowProcess",
            "lookahead"]
 
-__version__ = '0.2.0'
+__version__ = '0.3.0'
 
 T = TypeVar('T')
 
