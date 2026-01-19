@@ -7,7 +7,7 @@ sys.path.append('../test')
 from typing import List
 from dataclasses import dataclass
 import selfusepy
-from selfusepy.jsonparse import BaseJsonObject, DeserializeConfig, JsonField
+from selfusepy.jsonparse import BaseJsonObject, DeserializeConfig, ClassField
 from selfusepy.utils import override_str
 from datetime import datetime
 
@@ -43,14 +43,14 @@ class One1(BaseJsonObject):
 
 
 @override_str
-@DeserializeConfig({'x--': JsonField(varname='x')})
+@DeserializeConfig({'x--': ClassField(varname='x')})
 @dataclass(init=False)
 class One2(BaseJsonObject):
     x: str
     two: 'One2.Two'
 
     @override_str
-    @DeserializeConfig({'y--': JsonField(varname='y')})
+    @DeserializeConfig({'y--': ClassField(varname='y')})
     @dataclass(init=False)
     class Two(BaseJsonObject):
         y: str
@@ -58,7 +58,7 @@ class One2(BaseJsonObject):
 
         @override_str
         @dataclass(init=False)
-        @DeserializeConfig({'z--': JsonField(varname='z')})
+        @DeserializeConfig({'z--': ClassField(varname='z')})
         class Three(BaseJsonObject):
             z: str
 
@@ -239,7 +239,7 @@ class Obj(BaseJsonObject):
     client: str
     status: 'Obj.Status'
 
-    @DeserializeConfig({"$oid": JsonField("oid")})
+    @DeserializeConfig({"$oid": ClassField("oid")})
     @dataclass(init=False)
     class Id(BaseJsonObject):
         oid: str
@@ -253,10 +253,10 @@ class Obj(BaseJsonObject):
         cpu_usage: int
         memory_usage: int
 
-        @DeserializeConfig({"$date": JsonField("date", func=handle)})
+        @DeserializeConfig({"$date": ClassField("date", func=handle)})
         @dataclass(init=False)
         class Capture_time(BaseJsonObject):
-            date: datetime = datetime.now()
+            date: datetime
 
 
 def json_test_8() -> bool:
@@ -266,3 +266,32 @@ def json_test_8() -> bool:
     obj: Obj = selfusepy.parse_json(s, Obj())
     print(obj)
     return isinstance(obj, Obj)
+
+@override_str
+@dataclass(init=False)
+class One9(BaseJsonObject):
+    x: str
+    y: str
+
+def json_test_9() -> bool:
+    print("obj缺失变量")
+    with open("./jsontest/eg9.json", "r") as f:
+        s = f.read()
+    obj: One9 = selfusepy.parse_json(s, One9())
+    print(obj)
+    return isinstance(obj, One9)
+
+@override_str
+@dataclass(init=False)
+class One10(BaseJsonObject):
+    x: str
+    y: str
+    z: str
+
+def json_test_10() -> bool:
+    print("json缺失变量")
+    with open("./jsontest/eg10.json", "r") as f:
+        s = f.read()
+    obj: One10 = selfusepy.parse_json(s, One10())
+    print(obj)
+    return isinstance(obj, One10)

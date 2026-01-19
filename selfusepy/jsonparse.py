@@ -19,6 +19,7 @@
 """
 Json to Object的工具库
 """
+from dataclasses import fields
 from typing import MutableMapping, Any, Type, get_type_hints, get_origin, get_args
 
 class_dict = {}
@@ -33,22 +34,22 @@ class BaseJsonObject(object):
     pass
 
 
-class JsonField(object):
+class ClassField(object):
 
-    def __init__(self, varname=None, ignore: bool = False, func=None):
+    def __init__(self, varname: str = None, ignore: bool = False, func = None):
         self.varname: str = varname  # object's var's name
         self.ignore: bool = ignore  # do not convert this field
         self.handle_func = func  # handle function for this variable
 
 
-def DeserializeConfig(_map: MutableMapping[str, JsonField]):
+def DeserializeConfig(_map: MutableMapping[str, ClassField]):
     """
     :param _map: key->json key, value->annotation
     :return:
     """
 
     def func(clazz):
-        def get_annotation(self, k: str = None) -> JsonField | MutableMapping[str, JsonField]:
+        def get_annotation(self, k: str = None) -> ClassField | MutableMapping[str, ClassField]:
             return _map.get(k) if k else _map
 
         clazz.get_annotation = get_annotation
@@ -86,12 +87,13 @@ def _deserialize_object(d: dict) -> object | dict:
     """
     cls_name = d.pop(__classname__, None)
     cls = class_dict.get(cls_name)
+    field_names = [item.name for item in fields(cls)]
     if cls:
         obj = cls.__new__(cls)  # Make instance without calling __init__
         flag = hasattr(obj, 'get_annotation')
         for key, value in d.items():
-            if flag:  # 判断是否有JSONField注解
-                res: JsonField = obj.get_annotation(key)
+            if flag:  # 判断是否有ClassField注解
+                res: ClassField = obj.get_annotation(key)
                 if res:  # 判断这个key是否配置了注解
                     if res.ignore:
                         continue
@@ -99,6 +101,8 @@ def _deserialize_object(d: dict) -> object | dict:
                         key = res.varname
                     if res.handle_func:
                         value = res.handle_func(value)
+            if not any(key == item for item in field_names):
+                continue
             setattr(obj, key, value)
         return obj
     else:
@@ -123,9 +127,7 @@ def _add_classname(d: dict, t: Type) -> dict:
         elif isinstance(v, list):
             for item in v:
                 # 如果这个list是基本类型(int, str...)之类则不需要添加classname
-                if isinstance(item, int) or isinstance(item, str) or \
-                        isinstance(item, bool) or isinstance(item, float) or \
-                        isinstance(item, complex):
+                if any(isinstance(item, tp) for tp in (int, str, bool, float, complex)):
                     break
                 _add_classname(item, type_hints.get(k))
 

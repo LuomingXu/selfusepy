@@ -1,6 +1,6 @@
 [project]
 name = "selfusepy"
-version = "0.3.0"
+version = "0.4.0"
 description = "Self-Use Python lib"
 readme = "README.md"
 authors = [{name = "Luoming Xu", email = "me@luomingxu.cn"}]

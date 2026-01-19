@@ -7,6 +7,8 @@ import logtest.package.package.package
 import logtest.package.package.package.package
 import logtest.package.package.package.package.package.longlonglonglonglonglonglonglong
 
+import sys
+sys.path.append('./')
 
 class TestCase(unittest.TestCase):
     def test_jsonparse(self):
@@ -19,6 +21,8 @@ class TestCase(unittest.TestCase):
         self.assertEqual(jsontest.json_test_6(), True)
         self.assertEqual(jsontest.json_test_7(), True)
         self.assertEqual(jsontest.json_test_8(), True)
+        self.assertEqual(jsontest.json_test_9(), True)
+        self.assertEqual(jsontest.json_test_10(), True)
 
 
 if __name__ == '__main__':

@@ -20,14 +20,14 @@ import json
 from datetime import datetime, timezone, timedelta
 from typing import TypeVar, List
 
-from .jsonparse import BaseJsonObject, JsonField, DeserializeConfig
+from .jsonparse import BaseJsonObject, ClassField, DeserializeConfig
 from .log import Logger
 from .utils import eprint, override_str, ShowProcess, lookahead
 
-__all__ = ["BaseJsonObject", "JsonField", "DeserializeConfig", "Logger", "eprint", "override_str", "ShowProcess",
+__all__ = ["BaseJsonObject", "ClassField", "DeserializeConfig", "Logger", "eprint", "override_str", "ShowProcess",
            "lookahead"]
 
-__version__ = '0.3.0'
+__version__ = '0.4.0'
 
 T = TypeVar('T')
 
