@@ -1,4 +1,4 @@
-#    Copyright 2018-2020 LuomingXu
+#    Copyright 2018-2026 LuomingXu
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -19,11 +19,12 @@
 """
 Json to Object的工具库
 """
+
 from dataclasses import fields
-from typing import MutableMapping, Any, Type, get_type_hints, get_origin, get_args
+from typing import Any, MutableMapping, Type, get_args, get_origin, get_type_hints
 
 class_dict = {}
-__classname__: str = '__classname__'
+__classname__: str = "__classname__"
 
 
 class BaseJsonObject(object):
@@ -31,12 +32,12 @@ class BaseJsonObject(object):
     用于在用户自定义Json的转化目标类的基类
     以是否为此基类的子类来判断这个类是否需要转化
     """
+
     pass
 
 
 class ClassField(object):
-
-    def __init__(self, varname: str = None, ignore: bool = False, func = None):
+    def __init__(self, varname: str, ignore: bool = False, func=None):
         self.varname: str = varname  # object's var's name
         self.ignore: bool = ignore  # do not convert this field
         self.handle_func = func  # handle function for this variable
@@ -49,7 +50,9 @@ def DeserializeConfig(_map: MutableMapping[str, ClassField]):
     """
 
     def func(clazz):
-        def get_annotation(self, k: str = None) -> ClassField | MutableMapping[str, ClassField]:
+        def get_annotation(
+            self, k: str
+        ) -> None | ClassField | MutableMapping[str, ClassField]:
             return _map.get(k) if k else _map
 
         clazz.get_annotation = get_annotation
@@ -86,11 +89,11 @@ def _deserialize_object(d: dict) -> object | dict:
     :return: object
     """
     cls_name = d.pop(__classname__, None)
-    cls = class_dict.get(cls_name)
+    cls: Any = class_dict.get(cls_name)
     field_names = [item.name for item in fields(cls)]
     if cls:
         obj = cls.__new__(cls)  # Make instance without calling __init__
-        flag = hasattr(obj, 'get_annotation')
+        flag = hasattr(obj, "get_annotation")
         for key, value in d.items():
             if flag:  # 判断是否有ClassField注解
                 res: ClassField = obj.get_annotation(key)
@@ -109,7 +112,7 @@ def _deserialize_object(d: dict) -> object | dict:
         return d
 
 
-def _add_classname(d: dict, t: Type) -> dict:
+def _add_classname(d: dict, t: Any) -> dict:
     """
     给json字符串添加一个"__classname__"的key来作为转化的标志
     :param d: json的字典

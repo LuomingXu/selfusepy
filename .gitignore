@@ -6,3 +6,5 @@ dist/
 build/
 update_version.py
 .vscode/
+.coverage
+coverage.xml

@@ -3,7 +3,7 @@ name = "selfusepy"
 version = "0.4.0"
 description = "Self-Use Python lib"
 readme = "README.md"
-authors = [{name = "Luoming Xu", email = "me@luomingxu.cn"}]
+authors = [{ name = "Luoming Xu", email = "me@luomingxu.cn" }]
 requires-python = ">=3.10"
 license = "Apache-2.0"
 classifiers = [
@@ -17,10 +17,18 @@ classifiers = [
     'Natural Language :: Chinese (Simplified)',
     'Operating System :: OS Independent',
     'Topic :: Utilities',
-    'Typing :: Typed'
+    'Typing :: Typed',
 ]
-dependencies = [
+dependencies = []
 
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+    "pytest-cov>=7.0.0",
+    "pytest-datadir>=1.8.0",
+    "pytest-sugar>=1.1.1",
+    "pytest-xdist>=3.8.0",
+    "ruff>=0.14.14",
 ]
 
 [project.urls]
@@ -29,6 +37,45 @@ Documentation = "https://github.com/LuomingXu/selfusepy"
 Repository = "https://github.com/LuomingXu/selfusepy"
 Issues = "https://github.com/LuomingXu/selfusepy/issues"
 
-[tool.setuptools.packages.find]
-include = ["selfusepy"]
-exclude = ["tests*", "test*"]
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+# Hatch 会自动识别 src/selfusepy 并将其在安装后置于根部
+# 你只需要指定包所在的路径即可
+packages = ["src/selfusepy"]
+
+[tool.hatch.build.targets.sdist]
+# 源码包
+include = [
+    "/src",
+    "/LICENSE",
+    "/README.md",
+    "pyproject.toml",
+]
+
+[tool.pytest]
+pythonpath = ["src"] # 必须, 因为src和tests在同一级下
+testpaths = ["tests"]
+
+[tool.ruff]
+# 这里只保留全局设置，比如行长、目标版本
+line-length = 88
+target-version = "py313"
+
+[tool.ruff.lint]
+# 所有的规则选择都挪到这个 [lint] 区域
+select = ["E", "F", "I"]
+fixable = ["ALL"]
+unfixable = []
+
+[tool.ruff.lint.isort]
+# 针对排序的具体设置
+section-order = [
+    "future",
+    "standard-library",
+    "third-party",
+    "first-party",
+    "local-folder",
+]

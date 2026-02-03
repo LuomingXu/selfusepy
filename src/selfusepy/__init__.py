@@ -1,4 +1,4 @@
-#    Copyright 2018-2020 LuomingXu
+#    Copyright 2018-2026 LuomingXu
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -17,19 +17,28 @@
 #   Repo: https://github.com/LuomingXu/selfusepy
 
 import json
-from datetime import datetime, timezone, timedelta
-from typing import TypeVar, List
+from datetime import datetime, timedelta, timezone
+from typing import List, TypeVar
 
+from . import jsonparse
 from .jsonparse import BaseJsonObject, ClassField, DeserializeConfig
 from .log import Logger
-from .utils import eprint, override_str, ShowProcess, lookahead
+from .utils import ShowProcess, eprint, lookahead, override_str
 
-__all__ = ["BaseJsonObject", "ClassField", "DeserializeConfig", "Logger", "eprint", "override_str", "ShowProcess",
-           "lookahead"]
+__all__ = [
+    "BaseJsonObject",
+    "ClassField",
+    "DeserializeConfig",
+    "Logger",
+    "eprint",
+    "override_str",
+    "ShowProcess",
+    "lookahead",
+]
 
-__version__ = '0.4.0'
+__version__ = "0.4.0"
 
-T = TypeVar('T')
+T = TypeVar("T", bound=BaseJsonObject)
 
 
 def fromtimestamp(timestamp: float, offset: int) -> datetime:
@@ -50,9 +59,9 @@ def parse_json(j: str | bytes | bytearray, obj: T) -> T:
     :return: obj
     """
 
-    jsonparse._generate_class_dict(obj)
+    jsonparse._generate_class_dict(obj=obj)
     json_dict: dict = json.loads(j)
-    j_modified: str = json.dumps(jsonparse._add_classname(json_dict, type(obj)))
+    j_modified: str = json.dumps(jsonparse._add_classname(d=json_dict, t=type(obj)))
     res = json.loads(j_modified, object_hook=jsonparse._deserialize_object)
 
     jsonparse.class_dict.clear()

@@ -1,4 +1,4 @@
-#    Copyright 2018-2020 LuomingXu
+#    Copyright 2018-2026 LuomingXu
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
 #   Author : Luoming Xu
 #   File Name : utils.py
 #   Repo: https://github.com/LuomingXu/selfusepy
-
 import ctypes
 import inspect
 import os
@@ -23,7 +22,7 @@ import sys
 from typing import MutableMapping
 
 
-def eprint(*args, sep=' ', end='\n', file=sys.stderr):
+def eprint(*args, sep=" ", end="\n", file=sys.stderr):
     """
     collect from: https://stackoverflow.com/questions/5574702/how-to-print-to-stderr-in-python
     """
@@ -39,13 +38,13 @@ def override_str(clazz):
         values: MutableMapping = {}
         for k, v in vars(self).items():
             if isinstance(v, list):
-                values[k] = '[%s]' % ', '.join('%s' % item.__str__() for item in v)
+                values[k] = "[%s]" % ", ".join("%s" % item.__str__() for item in v)
             else:
                 values[k] = v.__str__()
 
-        return '%s(%s)' % (
+        return "%s(%s)" % (
             type(self).__name__,  # class name
-            ', '.join('%s: %s' % item for item in values.items())
+            ", ".join("%s: %s" % item for item in values.items()),
         )
 
     clazz.__str__ = __str__
@@ -62,9 +61,9 @@ class ShowProcess(object):
     i = 0  # 当前的处理进度
     max_steps = 0  # 总共需要处理的次数
     max_arrow = 50  # 进度条的长度
-    infoDone = 'done'
+    infoDone = "done"
 
-    def __init__(self, max_steps, infoDone='Done'):
+    def __init__(self, max_steps, infoDone="Done"):
         """
         初始化函数，需要知道总共的处理次数
         :param max_steps: 总共需要处理的次数
@@ -86,34 +85,37 @@ class ShowProcess(object):
         num_arrow = int(self.i * self.max_arrow / self.max_steps)  # 计算显示多少个'>'
         num_line = self.max_arrow - num_arrow  # 计算显示多少个'-'
         percent = self.i * 100.0 / self.max_steps  # 计算完成进度，格式为xx.xx%
-        process_bar = '[' + '>' * num_arrow + '-' * num_line + ']' \
-                      + '%.2f' % percent + '%' + '\r'  # 带输出的字符串，'\r'表示不换行回到最左边
+        process_bar = (
+            "[" + ">" * num_arrow + "-" * num_line + "]" + "%.2f" % percent + "%" + "\r"
+        )  # 带输出的字符串，'\r'表示不换行回到最左边
         sys.stdout.write(process_bar)  # 这两句打印字符到终端
         sys.stdout.flush()
         if self.i >= self.max_steps:
             self.close()
 
     def close(self):
-        print('')
+        print("")
         print(self.infoDone)
         self.i = 0
 
 
 class RootPath(object):
     """获取根目录"""
+
     root_path = None
 
     def __init__(self):
-        if RootPath.root_path == None:
+        if RootPath.root_path is None:
             # 判断调试模式
-            debug_vars = dict((a, b) for a, b in os.environ.items()
-                              if a.find('IPYTHONENABLE') >= 0)
+            debug_vars = dict(
+                (a, b) for a, b in os.environ.items() if a.find("IPYTHONENABLE") >= 0
+            )
 
             # 根据不同场景获取根目录
             if len(debug_vars) > 0:
                 """当前为debug运行时"""
                 RootPath.root_path = sys.path[2]
-            elif getattr(sys, 'frozen', False):
+            elif getattr(sys, "frozen", False):
                 """当前为exe运行时"""
                 RootPath.root_path = os.getcwd()
             else:
@@ -121,7 +123,7 @@ class RootPath(object):
                 RootPath.root_path = sys.path[1]
 
             # 替换斜杠
-            RootPath.root_path = RootPath.root_path.replace('\\', '/')
+            RootPath.root_path = RootPath.root_path.replace("\\", "/")
 
 
 def lookahead(iterable):
@@ -154,8 +156,9 @@ def async_raise(tid, exctype):
     """Raises an exception in the threads with tid"""
     if not inspect.isclass(exctype):
         raise TypeError("Only types can be raised (not instances)")
-    res = ctypes.pythonapi.PyThreadState_SetAsyncExc(ctypes.c_long(tid),
-                                                     ctypes.py_object(exctype))
+    res = ctypes.pythonapi.PyThreadState_SetAsyncExc(
+        ctypes.c_long(tid), ctypes.py_object(exctype)
+    )
     if res == 0:
         raise ValueError("invalid thread id")
     elif res != 1:

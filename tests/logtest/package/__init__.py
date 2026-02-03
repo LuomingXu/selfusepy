@@ -2,5 +2,5 @@ from selfusepy.log import Logger
 
 
 def log_test():
-  log = Logger().logger
-  log.info('sixth')
+    log = Logger().logger
+    log.info("second")
