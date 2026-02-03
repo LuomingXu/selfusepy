@@ -36,7 +36,7 @@ __all__ = [
     "lookahead",
 ]
 
-__version__ = "0.4.0"
+__version__ = "0.5.0"
 
 T = TypeVar("T", bound=BaseJsonObject)
 
