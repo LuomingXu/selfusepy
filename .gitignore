@@ -8,3 +8,6 @@ update_version.py
 .vscode/
 .coverage
 *.xml
+.venv/
+.ruff_cache/
+.pytest_cache/
